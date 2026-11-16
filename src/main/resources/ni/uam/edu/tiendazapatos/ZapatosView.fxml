@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.geometry.Insets?>
+<VBox alignment="CENTER" spacing="15.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ni.uam.edu.tiendazapatos.Controller.ZapatosViewController">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+
+    <Label style="-fx-font-size: 24px; -fx-font-weight: bold;" text="📦 Inventario de Zapatos" />
+
+    <TableView fx:id="tablaZapatos" prefHeight="300.0" prefWidth="600.0">
+        <columns>
+            <TableColumn fx:id="colNombre" text="Modelo" prefWidth="200.0" />
+            <TableColumn fx:id="colMarca" text="Marca" prefWidth="150.0" />
+            <TableColumn fx:id="colPrecio" text="Precio Final" prefWidth="150.0" />
+            <TableColumn fx:id="colEstado" text="Estado" prefWidth="100.0" />
+        </columns>
+    </TableView>
+
+    <HBox spacing="15.0" alignment="CENTER">
+        <Button fx:id="btnVerDetalles" onAction="#handleVerDetalles" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20;" text="👁️ Ver Detalles" />
+        <Button fx:id="btnEditar" onAction="#handleEditarZapato" style="-fx-background-color: #FF9800; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20;" text="✏️ Editar" />
+        <Button fx:id="btnAgregar" onAction="#handleAgregarZapato" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20;" text="+ Agregar Nuevo Zapato" />
+        <Button onAction="#handleCerrarSesion" style="-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20;" text="Cerrar Sesión" />
+    </HBox>
+
+</VBox>
