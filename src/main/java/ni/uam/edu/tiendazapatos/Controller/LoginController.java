@@ -44,11 +44,21 @@ public class LoginController {
 
                 // --- AQUÍ EMPIEZA EL CAMBIO PARA REDIRIGIR AL MENÚ ---
                 try {
-                    FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/ni/uam/edu/tiendazapatos/ZapatosView.fxml"));
-                    Scene scene = new Scene(fxmlLoader.load(), 650, 500);
+                    FXMLLoader fxmlLoader = new FXMLLoader(
+                            getClass().getResource("/ni/uam/edu/tiendazapatos/ZapatosView.fxml")
+                    );
+
+                    Scene scene = new Scene(fxmlLoader.load(), 1200, 690);
+
                     Stage stage = (Stage) lblMensaje.getScene().getWindow();
+
                     stage.setTitle("Sistema Tienda de Zapatos - Inventario");
                     stage.setScene(scene);
+
+// Abrir el inventario maximizado
+                    stage.setMaximized(true);
+                    stage.show();
+
                 } catch (IOException e) {
                     e.printStackTrace();
                     lblMensaje.setText("Error al cargar el menú.");

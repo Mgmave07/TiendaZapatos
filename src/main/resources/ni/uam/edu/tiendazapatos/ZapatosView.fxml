@@ -1,33 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<?import javafx.geometry.Insets?>
-<VBox alignment="CENTER" spacing="15.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ni.uam.edu.tiendazapatos.Controller.ZapatosViewController">
+<VBox alignment="TOP_CENTER" spacing="14.0" prefWidth="1200" prefHeight="690"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="ni.uam.edu.tiendazapatos.Controller.ZapatosViewController">
     <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+        <Insets top="20" bottom="20" left="20" right="20"/>
     </padding>
 
-    <Label style="-fx-font-size: 24px; -fx-font-weight: bold;" text="📦 Inventario de Zapatos" />
+    <Label text="Inventario de Zapatos" style="-fx-font-size: 25px; -fx-font-weight: bold;"/>
+    <Label text="Control por género, sistema de tallas, color y existencias"
+           style="-fx-font-size: 13px; -fx-text-fill: #606060;"/>
 
-    <TableView fx:id="tablaZapatos" prefHeight="300.0" prefWidth="600.0">
+    <HBox spacing="12" alignment="CENTER_LEFT">
+        <TextField fx:id="txtBuscar" promptText="Buscar modelo, marca, SKU, talla o ID..."
+                   HBox.hgrow="ALWAYS"/>
+        <Label text="Género:"/>
+        <ComboBox fx:id="cmbGenero" prefWidth="140"/>
+        <CheckBox fx:id="chkSoloDisponibles" text="Solo disponibles"/>
+        <Button text="Actualizar" onAction="#handleActualizar"/>
+    </HBox>
+
+    <TableView fx:id="tablaZapatos" VBox.vgrow="ALWAYS" prefHeight="460">
         <columns>
-            <TableColumn fx:id="colNombre" text="Modelo" prefWidth="200.0" />
-            <TableColumn fx:id="colMarca" text="Marca" prefWidth="150.0" />
-            <TableColumn fx:id="colPrecio" text="Precio Final" prefWidth="150.0" />
-            <TableColumn fx:id="colEstado" text="Estado" prefWidth="100.0" />
+            <TableColumn fx:id="colNombre" text="Modelo" prefWidth="145"/>
+            <TableColumn fx:id="colMarca" text="Marca" prefWidth="95"/>
+            <TableColumn fx:id="colGenero" text="Género" prefWidth="85"/>
+            <TableColumn fx:id="colSistemaTalla" text="Sistema" prefWidth="75"/>
+            <TableColumn fx:id="colTalla" text="Talla" prefWidth="70"/>
+            <TableColumn fx:id="colColor" text="Color" prefWidth="95"/>
+            <TableColumn fx:id="colSku" text="SKU" prefWidth="105"/>
+            <TableColumn fx:id="colStock" text="Stock" prefWidth="110"/>
+            <TableColumn fx:id="colPrecio" text="Precio final" prefWidth="110"/>
+            <TableColumn fx:id="colVentas" text="Ventas modelo" prefWidth="110"/>
+            <TableColumn fx:id="colEstado" text="Estado" prefWidth="115"/>
         </columns>
     </TableView>
 
-    <HBox spacing="15.0" alignment="CENTER">
-        <Button fx:id="btnVerDetalles" onAction="#handleVerDetalles" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20;" text="👁️ Ver Detalles" />
-        <Button fx:id="btnEditar" onAction="#handleEditarZapato" style="-fx-background-color: #FF9800; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20;" text="✏️ Editar" />
-        <Button fx:id="btnAgregar" onAction="#handleAgregarZapato" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20;" text="+ Agregar Nuevo Zapato" />
-        <Button onAction="#handleCerrarSesion" style="-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20;" text="Cerrar Sesión" />
+    <HBox spacing="12" alignment="CENTER">
+        <Button fx:id="btnVerDetalles" text="Ver Detalles" onAction="#handleVerDetalles"
+                style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-padding: 10 20;"/>
+        <Button fx:id="btnEditar" text="Editar" onAction="#handleEditarZapato"
+                style="-fx-background-color: #FF9800; -fx-text-fill: white; -fx-padding: 10 20;"/>
+        <Button text="+ Agregar Zapato" onAction="#handleAgregarZapato"
+                style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 10 20;"/>
+        <Button text="Cerrar Sesión" onAction="#handleCerrarSesion"
+                style="-fx-background-color: #f44336; -fx-text-fill: white; -fx-padding: 10 20;"/>
     </HBox>
-
 </VBox>
