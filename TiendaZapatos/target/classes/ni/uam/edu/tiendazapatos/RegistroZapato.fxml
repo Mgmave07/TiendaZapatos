@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="CENTER" spacing="12.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ni.uam.edu.tiendazapatos.Controller.RegistroZapatoController">
+    <padding><Insets bottom="20.0" left="20.0" right="20.0" top="20.0" /></padding>
+
+    <Label style="-fx-font-size: 20px; -fx-font-weight: bold;" text="Registrar Nuevo Zapato" />
+
+    <Label text="DATOS DEL MODELO" style="-fx-font-weight: bold; -fx-text-fill: #555555;" />
+    <TextField fx:id="txtNombre" promptText="Nombre del modelo" prefWidth="350"/>
+    <HBox spacing="10.0" alignment="CENTER" prefWidth="350">
+        <ComboBox fx:id="cmbMarca" promptText="Selecciona una marca" HBox.hgrow="ALWAYS"/>
+        <Button fx:id="btnNuevaMarca" onAction="#handleNuevaMarca" text="+ Nueva" style="-fx-background-color: #2196F3; -fx-text-fill: white;" />
+    </HBox>
+    <HBox spacing="10.0" alignment="CENTER">
+        <TextField fx:id="txtPrecioBase" promptText="Precio Base (C$)" prefWidth="170"/>
+        <TextField fx:id="txtDescuento" promptText="Descuento (%)" prefWidth="170"/>
+    </HBox>
+    <TextArea fx:id="txtDescripcion" promptText="Descripción del producto" prefWidth="350" prefRowCount="3"/>
+    <HBox spacing="10.0" alignment="CENTER">
+        <Button fx:id="btnSeleccionarImagen" onAction="#handleSeleccionarImagen" text="📷 Seleccionar Imagen" />
+        <Label fx:id="lblNombreImagen" text="Ninguna seleccionada" textFill="#666666" />
+    </HBox>
+
+    <Label text="VARIANTE INICIAL" style="-fx-font-weight: bold; -fx-text-fill: #555555;" />
+    <HBox spacing="10.0" alignment="CENTER">
+        <ComboBox fx:id="cmbGenero" promptText="Género" prefWidth="170"/>
+        <ComboBox fx:id="cmbSistemaTalla" promptText="Sistema talla" prefWidth="170"/>
+    </HBox>
+    <HBox spacing="10.0" alignment="CENTER">
+        <TextField fx:id="txtTalla" promptText="Talla (ej. 42)" prefWidth="110"/>
+        <TextField fx:id="txtColor" promptText="Color" prefWidth="110"/>
+        <TextField fx:id="txtStockInicial" promptText="Stock inicial" prefWidth="110"/>
+    </HBox>
+
+    <Button fx:id="btnGuardar" onAction="#handleGuardar" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 30;" text="Guardar en Inventario" />
+    <Label fx:id="lblMensaje" textFill="red" wrapText="true" maxWidth="350"/>
+    <Button onAction="#handleVolver" style="-fx-background-color: transparent; -fx-text-fill: #2196F3; -fx-underline: true;" text="Volver al Inventario" />
+</VBox>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="10.0" prefWidth="1200" prefHeight="700"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="ni.uam.edu.tiendazapatos.Controller.AdminViewController">
+    <padding>
+        <Insets top="12" bottom="12" left="15" right="15"/>
+    </padding>
+
+    <!-- Barra superior de Administrador con botón de cerrar sesión -->
+    <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-background-color: #2c3e50; -fx-padding: 10 18; -fx-background-radius: 6;">
+        <Label text="🛠 Panel de Administrador" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label fx:id="lblAdminInfo" text="Administrador" style="-fx-text-fill: #ecf0f1; -fx-font-size: 13px;"/>
+        <Button fx:id="btnCerrarSesion" text="Cerrar Sesión" onAction="#handleCerrarSesion"
+                style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 7 15; -fx-cursor: hand; -fx-background-radius: 4;"/>
+    </HBox>
+
+    <!-- TabPane con Inventario, Facturación y Registro de Usuarios -->
+    <TabPane VBox.vgrow="ALWAYS" tabClosingPolicy="UNAVAILABLE">
+        <Tab text="Inventario de Zapatos">
+            <fx:include source="ZapatosView.fxml"/>
+        </Tab>
+        <Tab text="Facturación / Ventas">
+            <fx:include source="VentasView.fxml"/>
+        </Tab>
+        <Tab text="Registrar Usuario">
+            <ScrollPane fitToWidth="true" fitToHeight="true" style="-fx-background-color: transparent;">
+                <VBox alignment="CENTER" spacing="15.0" style="-fx-padding: 25;">
+                    <Label text="Registro de Nuevo Usuario" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+                    <Label text="Crea un nuevo usuario en la base de datos asignándole un rol." style="-fx-text-fill: #7f8c8d; -fx-font-size: 13px;"/>
+
+                    <VBox spacing="12" alignment="CENTER" maxWidth="420" style="-fx-background-color: #ffffff; -fx-padding: 25; -fx-background-radius: 8; -fx-border-color: #dcdde1; -fx-border-radius: 8;">
+                        <VBox spacing="4" alignment="CENTER_LEFT">
+                            <Label text="Nombre de usuario:" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
+                            <TextField fx:id="txtNuevoUsuario" promptText="Nombre de usuario (ej: vendedor1)" prefWidth="380"/>
+                        </VBox>
+
+                        <VBox spacing="4" alignment="CENTER_LEFT">
+                            <Label text="Nombre completo:" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
+                            <TextField fx:id="txtNuevoNombreCompleto" promptText="Nombre y apellidos" prefWidth="380"/>
+                        </VBox>
+
+                        <VBox spacing="4" alignment="CENTER_LEFT">
+                            <Label text="Correo electrónico:" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
+                            <TextField fx:id="txtNuevoCorreo" promptText="correo@ejemplo.com" prefWidth="380"/>
+                        </VBox>
+
+                        <VBox spacing="4" alignment="CENTER_LEFT">
+                            <Label text="Contraseña:" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
+                            <PasswordField fx:id="txtNuevoPassword" promptText="Contraseña" prefWidth="380"/>
+                        </VBox>
+
+                        <VBox spacing="4" alignment="CENTER_LEFT">
+                            <Label text="Rol:" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
+                            <ComboBox fx:id="cmbNuevoRol" promptText="Seleccionar rol..." prefWidth="380"/>
+                        </VBox>
+
+                        <Button fx:id="btnGuardarUsuario" text="Guardar Usuario" onAction="#handleRegistrarUsuario"
+                                style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-cursor: hand; -fx-background-radius: 4;"
+                                maxWidth="Infinity"/>
+
+                        <Label fx:id="lblMensajeRegistro" wrapText="true" maxWidth="380" alignment="CENTER"/>
+                    </VBox>
+                </VBox>
+            </ScrollPane>
+        </Tab>
+    </TabPane>
+</VBox>
