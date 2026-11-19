@@ -30,4 +30,9 @@ public class Rol {
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
     public LocalDateTime getCreadoEn() { return creadoEn; }
     public void setCreadoEn(LocalDateTime creadoEn) { this.creadoEn = creadoEn; }
+
+    @Override
+    public String toString() {
+        return nombre != null ? nombre : "";
+    }
 }

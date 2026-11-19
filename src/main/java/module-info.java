@@ -14,4 +14,6 @@ module ni.uam.edu.tiendazapatos {
     exports ni.uam.edu.tiendazapatos;
     exports ni.uam.edu.tiendazapatos.modelo;
     exports ni.uam.edu.tiendazapatos.Controller;
+    exports ni.uam.edu.tiendazapatos.config;
+    exports ni.uam.edu.tiendazapatos.dao;
 }

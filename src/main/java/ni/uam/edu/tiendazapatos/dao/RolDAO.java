@@ -6,6 +6,9 @@ import jakarta.persistence.TypedQuery;
 import ni.uam.edu.tiendazapatos.config.HibernateUtil;
 import ni.uam.edu.tiendazapatos.modelo.Rol;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class RolDAO {
     public Rol buscarPorNombre(String nombre) {
         EntityManager em = HibernateUtil.getEntityManager();
@@ -23,5 +26,19 @@ public class RolDAO {
             em.close();
         }
         return rol;
+    }
+
+    public List<Rol> obtenerTodos() {
+        EntityManager em = HibernateUtil.getEntityManager();
+        try {
+            String jpql = "SELECT r FROM Rol r ORDER BY r.nombre";
+            TypedQuery<Rol> query = em.createQuery(jpql, Rol.class);
+            return query.getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        } finally {
+            em.close();
+        }
     }
 }

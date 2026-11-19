@@ -20,7 +20,5 @@
 
     <Button fx:id="btnIngresar" onAction="#handleIngresar" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 30;" text="Ingresar" />
 
-    <Button fx:id="btnRegistro" onAction="#handleRegistro" style="-fx-background-color: transparent; -fx-text-fill: #2196F3; -fx-underline: true;" text="¿No tienes cuenta? Regístrate aquí" />
-
     <Label fx:id="lblMensaje" textFill="red" wrapText="true" maxWidth="300"/>
 </VBox>

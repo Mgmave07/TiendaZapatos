@@ -16,6 +16,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import ni.uam.edu.tiendazapatos.config.SesionUsuario;
 import ni.uam.edu.tiendazapatos.dao.InventarioDAO;
 import ni.uam.edu.tiendazapatos.dao.ZapatoDAO;
 import ni.uam.edu.tiendazapatos.modelo.InventarioFila;
@@ -197,12 +198,15 @@ public class ZapatosViewController {
     @FXML
     private void handleCerrarSesion() {
         try {
+            SesionUsuario.getInstancia().cerrar();
             FXMLLoader loader = new FXMLLoader(getClass().getResource(
                     "/ni/uam/edu/tiendazapatos/Login.fxml"));
             Scene scene = new Scene(loader.load(), 450, 500);
             Stage stage = (Stage) tablaZapatos.getScene().getWindow();
             stage.setTitle("Sistema Tienda de Zapatos - Login");
             stage.setScene(scene);
+            stage.setMaximized(false);
+            stage.centerOnScreen();
         } catch (IOException e) {
             e.printStackTrace();
             mostrarError("No se pudo regresar al login", e.getMessage());
