@@ -38,7 +38,6 @@ public class ZapatosViewController {
     @FXML private TableColumn<InventarioFila, String> colSistemaTalla;
     @FXML private TableColumn<InventarioFila, String> colTalla;
     @FXML private TableColumn<InventarioFila, String> colColor;
-    @FXML private TableColumn<InventarioFila, String> colSku;
     @FXML private TableColumn<InventarioFila, String> colStock;
     @FXML private TableColumn<InventarioFila, String> colPrecio;
     @FXML private TableColumn<InventarioFila, String> colVentas;
@@ -65,7 +64,6 @@ public class ZapatosViewController {
         colSistemaTalla.setCellValueFactory(c -> texto(c.getValue().sistemaTalla()));
         colTalla.setCellValueFactory(c -> texto(c.getValue().talla()));
         colColor.setCellValueFactory(c -> texto(c.getValue().color()));
-        colSku.setCellValueFactory(c -> texto(c.getValue().sku()));
         colStock.setCellValueFactory(c -> texto(c.getValue().stock() == null
                 ? "Sin registrar" : c.getValue().stock().toString()));
         colPrecio.setCellValueFactory(c -> texto(c.getValue().zapato().getPrecioFinal() == null
@@ -110,13 +108,11 @@ public class ZapatosViewController {
             for (Zapato zapato : zapatos) {
                 List<InventarioDAO.Variante> variantes = variantesPorZapato.get(zapato.getZapatoId());
                 if (variantes == null || variantes.isEmpty()) {
-                    // No confundir "sin registro de inventario" con stock 0.
-                    filas.add(new InventarioFila(zapato, null, null, null, null, null, null));
+                    filas.add(new InventarioFila(zapato, null, null, null, null, null));
                 } else {
                     for (InventarioDAO.Variante variante : variantes) {
                         filas.add(new InventarioFila(
                                 zapato,
-                                variante.sku(),
                                 variante.genero(),
                                 variante.sistemaTalla(),
                                 variante.talla(),
@@ -148,7 +144,7 @@ public class ZapatosViewController {
             String contenido = String.join(" ",
                     valor(fila.zapato().getNombre()),
                     fila.zapato().getMarca() == null ? "" : valor(fila.zapato().getMarca().getNombre()),
-                    valor(fila.sku()), valor(fila.talla()), valor(fila.color()),
+                    valor(fila.talla()), valor(fila.color()),
                     valor(fila.genero()), valor(fila.sistemaTalla()),
                     fila.zapato().getZapatoId().toString()
             ).toLowerCase(Locale.ROOT);
@@ -236,14 +232,19 @@ public class ZapatosViewController {
 
     @FXML
     private void handleEditarZapato() {
-        Zapato seleccionado = zapatoSeleccionado();
-        if (seleccionado == null) return;
+        InventarioFila seleccion = tablaZapatos.getSelectionModel().getSelectedItem();
+        if (seleccion == null) {
+            new Alert(Alert.AlertType.WARNING, "Por favor, selecciona un zapato de la tabla primero.").showAndWait();
+            return;
+        }
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(
-                    "/ni/uam/edu/tiendazapatos/EditarZapato.fxml"));
-            Scene scene = new Scene(loader.load(), 450, 550);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ni/uam/edu/tiendazapatos/EditarZapato.fxml"));
+            Scene scene = new Scene(loader.load(), 500, 650);
             EditarZapatoController controller = loader.getController();
-            controller.setZapato(seleccionado);
+
+            // CAMBIO CLAVE: Pasamos el zapato Y la fila completa
+            controller.setDatos(seleccion.zapato(), seleccion);
+
             Stage stage = (Stage) tablaZapatos.getScene().getWindow();
             stage.setTitle("Editar Zapato");
             stage.setScene(scene);

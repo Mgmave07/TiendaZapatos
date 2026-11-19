@@ -32,7 +32,6 @@
             <TableColumn fx:id="colSistemaTalla" text="Sistema" prefWidth="75"/>
             <TableColumn fx:id="colTalla" text="Talla" prefWidth="70"/>
             <TableColumn fx:id="colColor" text="Color" prefWidth="95"/>
-            <TableColumn fx:id="colSku" text="SKU" prefWidth="105"/>
             <TableColumn fx:id="colStock" text="Stock" prefWidth="110"/>
             <TableColumn fx:id="colPrecio" text="Precio final" prefWidth="110"/>
             <TableColumn fx:id="colVentas" text="Ventas modelo" prefWidth="110"/>

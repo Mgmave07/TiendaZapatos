@@ -7,7 +7,6 @@ package ni.uam.edu.tiendazapatos.modelo;
  */
 public record InventarioFila(
         Zapato zapato,
-        String sku,
         String genero,
         String sistemaTalla,
         String talla,
