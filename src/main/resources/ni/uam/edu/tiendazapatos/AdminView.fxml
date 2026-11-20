@@ -20,10 +20,13 @@
                 style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 7 15; -fx-cursor: hand; -fx-background-radius: 4;"/>
     </HBox>
 
-    <!-- TabPane con Inventario (TableView reutilizado con fx:include) y Registro de Usuarios -->
+    <!-- TabPane con Inventario, Facturación y Registro de Usuarios -->
     <TabPane VBox.vgrow="ALWAYS" tabClosingPolicy="UNAVAILABLE">
         <Tab text="Inventario de Zapatos">
             <fx:include source="ZapatosView.fxml"/>
+        </Tab>
+        <Tab text="Facturación / Ventas">
+            <fx:include source="VentasView.fxml"/>
         </Tab>
         <Tab text="Registrar Usuario">
             <ScrollPane fitToWidth="true" fitToHeight="true" style="-fx-background-color: transparent;">

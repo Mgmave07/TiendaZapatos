@@ -54,13 +54,13 @@ public class InventarioDAO {
             em.createNativeQuery(
                             "INSERT INTO public.inventario " +
                                     "(zapato_id, genero, sistema_talla, talla, color, cantidad_stock) " +
-                                    "VALUES (CAST(:z AS uuid), :g, :s, :t, :c, :st)")
-                    .setParameter("z", zapatoId.toString())
-                    .setParameter("g", genero)
-                    .setParameter("s", sistemaTalla)
-                    .setParameter("t", talla)
-                    .setParameter("c", color)
-                    .setParameter("st", cantidadStock)
+                                    "VALUES (CAST(?1 AS uuid), ?2, ?3, ?4, ?5, ?6)")
+                    .setParameter(1, zapatoId.toString())
+                    .setParameter(2, genero)
+                    .setParameter(3, sistemaTalla)
+                    .setParameter(4, talla)
+                    .setParameter(5, color)
+                    .setParameter(6, cantidadStock)
                     .executeUpdate();
             em.getTransaction().commit();
         } catch (RuntimeException e) {
@@ -78,12 +78,12 @@ public class InventarioDAO {
         try {
             Object result = em.createNativeQuery(
                             "SELECT inventario_id FROM public.inventario " +
-                                    "WHERE zapato_id = CAST(:z AS uuid) AND genero = :g AND sistema_talla = :s AND talla = :t AND color = :c"
-                    ).setParameter("z", zapatoId.toString())
-                    .setParameter("g", genero)
-                    .setParameter("s", sistemaTalla)
-                    .setParameter("t", talla)
-                    .setParameter("c", color)
+                                    "WHERE zapato_id = CAST(?1 AS uuid) AND genero = ?2 AND sistema_talla = ?3 AND talla = ?4 AND color = ?5"
+                    ).setParameter(1, zapatoId.toString())
+                    .setParameter(2, genero)
+                    .setParameter(3, sistemaTalla)
+                    .setParameter(4, talla)
+                    .setParameter(5, color)
                     .getSingleResult();
             return (UUID) result;
         } catch (Exception e) {
@@ -99,14 +99,14 @@ public class InventarioDAO {
             em.getTransaction().begin();
             em.createNativeQuery(
                             "UPDATE public.inventario SET " +
-                                    "genero = :g, sistema_talla = :s, talla = :t, color = :c, cantidad_stock = :st " +
-                                    "WHERE inventario_id = CAST(:id AS uuid)"
-                    ).setParameter("id", inventarioId.toString())
-                    .setParameter("g", genero)
-                    .setParameter("s", sistemaTalla)
-                    .setParameter("t", talla)
-                    .setParameter("c", color)
-                    .setParameter("st", cantidadStock)
+                                    "genero = ?1, sistema_talla = ?2, talla = ?3, color = ?4, cantidad_stock = ?5 " +
+                                    "WHERE inventario_id = CAST(?6 AS uuid)"
+                    ).setParameter(1, genero)
+                    .setParameter(2, sistemaTalla)
+                    .setParameter(3, talla)
+                    .setParameter(4, color)
+                    .setParameter(5, cantidadStock)
+                    .setParameter(6, inventarioId.toString())
                     .executeUpdate();
             em.getTransaction().commit();
         } catch (RuntimeException e) {

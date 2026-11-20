@@ -34,6 +34,22 @@ public class VendedorViewController {
     }
 
     @FXML
+    private void handleAbrirVentas(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ni/uam/edu/tiendazapatos/VentasView.fxml"));
+            Scene scene = new Scene(loader.load());
+            Stage stage = new Stage();
+            stage.setTitle("Facturación - Tienda de Zapatos");
+            stage.setScene(scene);
+            stage.centerOnScreen();
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            mostrarError("Error al abrir facturación", e.getMessage());
+        }
+    }
+
+    @FXML
     private void handleCerrarSesion(ActionEvent event) {
         SesionUsuario.getInstancia().cerrar();
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
