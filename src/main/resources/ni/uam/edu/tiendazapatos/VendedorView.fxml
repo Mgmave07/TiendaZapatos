@@ -19,10 +19,14 @@
     <Label fx:id="lblBienvenida" text="¡Bienvenido al sistema!"
            style="-fx-font-size: 18px; -fx-text-fill: #34495e;"/>
 
-    <Label text="Módulo de ventas en blanco (Espacio de trabajo para el vendedor)"
-           style="-fx-font-size: 14px; -fx-text-fill: #95a5a6; -fx-font-style: italic;"/>
+    <Label text="Seleccione una opción para comenzar a operar"
+           style="-fx-font-size: 14px; -fx-text-fill: #7f8c8d;"/>
 
-    <Region prefHeight="30"/>
+    <Region prefHeight="20"/>
+
+    <!-- Botón principal de Facturación -->
+    <Button fx:id="btnAbrirVentas" text="Realizar Venta / Facturar" onAction="#handleAbrirVentas"
+            style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-padding: 12 30; -fx-background-radius: 5; -fx-cursor: hand;"/>
 
     <!-- Botón de cerrar sesión -->
     <Button fx:id="btnCerrarSesion" text="Cerrar Sesión" onAction="#handleCerrarSesion"

@@ -7,16 +7,29 @@
     <persistence-unit name="TiendaZapatosPU" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 
+        <!-- Clases Entidad del proyecto -->
+        <class>ni.uam.edu.tiendazapatos.modelo.DetalleVenta</class>
+        <class>ni.uam.edu.tiendazapatos.modelo.InventarioFila</class>
+        <class>ni.uam.edu.tiendazapatos.modelo.Marca</class>
+        <class>ni.uam.edu.tiendazapatos.modelo.Rol</class>
+        <class>ni.uam.edu.tiendazapatos.modelo.Usuario</class>
+        <class>ni.uam.edu.tiendazapatos.modelo.Venta</class>
+        <class>ni.uam.edu.tiendazapatos.modelo.Zapato</class>
+
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
             <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/TiendaZapatodDB"/>
+
+            <!-- Cada desarrollador debe poner su propio usuario y contraseña local aquí -->
             <property name="jakarta.persistence.jdbc.user" value="postgres"/>
-            <property name="jakarta.persistence.jdbc.password" value="1234"/>
+            <property name="jakarta.persistence.jdbc.password" value="PON_TU_CONTRASEÑA_LOCAL_AQUI"/>
 
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
             <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.format_sql" value="true"/>
-            <property name="hibernate.hbm2ddl.auto" value="validate"/>
+
+            <!-- 'update' permite que Hibernate cree las tablas a tus compañeros si no las tienen -->
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
         </properties>
     </persistence-unit>
 </persistence>
