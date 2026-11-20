@@ -22,7 +22,7 @@
 
             <!-- Cada desarrollador debe poner su propio usuario y contraseña local aquí -->
             <property name="jakarta.persistence.jdbc.user" value="postgres"/>
-            <property name="jakarta.persistence.jdbc.password" value="PON_TU_CONTRASEÑA_LOCAL_AQUI"/>
+            <property name="jakarta.persistence.jdbc.password" value="1234"/>
 
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
             <property name="hibernate.show_sql" value="true"/>
