@@ -1,73 +1,211 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox spacing="10.0" prefWidth="1200" prefHeight="700"
-      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="ni.uam.edu.tiendazapatos.Controller.AdminViewController">
-    <padding>
-        <Insets top="12" bottom="12" left="15" right="15"/>
-    </padding>
+<BorderPane prefWidth="1200.0" prefHeight="700.0"
+            xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="ni.uam.edu.tiendazapatos.Controller.AdminViewController"
+            style="-fx-background-color: #f3f6fa;">
 
-    <!-- Barra superior de Administrador con botón de cerrar sesión -->
-    <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-background-color: #2c3e50; -fx-padding: 10 18; -fx-background-radius: 6;">
-        <Label text="🛠 Panel de Administrador" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;"/>
-        <Region HBox.hgrow="ALWAYS"/>
-        <Label fx:id="lblAdminInfo" text="Administrador" style="-fx-text-fill: #ecf0f1; -fx-font-size: 13px;"/>
-        <Button fx:id="btnCerrarSesion" text="Cerrar Sesión" onAction="#handleCerrarSesion"
-                style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 7 15; -fx-cursor: hand; -fx-background-radius: 4;"/>
-    </HBox>
+    <!-- Cabecera fija -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="14"
+              style="-fx-background-color: #203247; -fx-padding: 15 22;">
+            <Label text="TIENDA DE ZAPATOS"
+                   style="-fx-text-fill: white; -fx-font-size: 19px; -fx-font-weight: bold;"/>
+            <Label text="|  Panel de administrador"
+                   style="-fx-text-fill: #cbd5e1; -fx-font-size: 13px;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="lblAdminInfo" text="Administrador"
+                   style="-fx-text-fill: #e2e8f0; -fx-font-size: 13px;"/>
+            <Button fx:id="btnCerrarSesion" text="Cerrar sesión"
+                    onAction="#handleCerrarSesion"
+                    style="-fx-background-color: #dc4545; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-background-radius: 6; -fx-padding: 9 16;"/>
+        </HBox>
+    </top>
 
-    <!-- TabPane con Inventario, Facturación y Registro de Usuarios -->
-    <TabPane VBox.vgrow="ALWAYS" tabClosingPolicy="UNAVAILABLE">
-        <Tab text="Inventario de Zapatos">
-            <fx:include source="ZapatosView.fxml"/>
-        </Tab>
-        <Tab text="Facturación / Ventas">
-            <fx:include source="VentasView.fxml"/>
-        </Tab>
-        <Tab text="Registrar Usuario">
-            <ScrollPane fitToWidth="true" fitToHeight="true" style="-fx-background-color: transparent;">
-                <VBox alignment="CENTER" spacing="15.0" style="-fx-padding: 25;">
-                    <Label text="Registro de Nuevo Usuario" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
-                    <Label text="Crea un nuevo usuario en la base de datos asignándole un rol." style="-fx-text-fill: #7f8c8d; -fx-font-size: 13px;"/>
+    <!-- Navegación fija: no son pestañas -->
+    <left>
+        <VBox spacing="12" prefWidth="225"
+              style="-fx-background-color: #293f58; -fx-padding: 24 14;">
+            <Label text="NAVEGACIÓN"
+                   style="-fx-text-fill: #b8c8dc; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 0 9 6 9;"/>
+            <Button fx:id="btnNavInicio" text="⌂   Inicio" onAction="#mostrarInicio" maxWidth="Infinity"
+                    alignment="CENTER_LEFT"
+                    style="-fx-background-color: transparent; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 7; -fx-padding: 14 16; -fx-font-size: 14px;"/>
+            <Button fx:id="btnNavInventario" text="▣   Inventario" onAction="#mostrarInventario" maxWidth="Infinity"
+                    alignment="CENTER_LEFT"
+                    style="-fx-background-color: transparent; -fx-text-fill: white; -fx-cursor: hand; -fx-padding: 14 16; -fx-font-size: 14px;"/>
+            <Button fx:id="btnNavVentas" text="▤   Ventas y facturación" onAction="#mostrarVentas" maxWidth="Infinity"
+                    alignment="CENTER_LEFT"
+                    style="-fx-background-color: transparent; -fx-text-fill: white; -fx-cursor: hand; -fx-padding: 14 16; -fx-font-size: 14px;"/>
+            <Button fx:id="btnNavUsuarios" text="♙   Registrar usuario" onAction="#mostrarRegistro" maxWidth="Infinity"
+                    alignment="CENTER_LEFT"
+                    style="-fx-background-color: transparent; -fx-text-fill: white; -fx-cursor: hand; -fx-padding: 14 16; -fx-font-size: 14px;"/>
+            <Region VBox.vgrow="ALWAYS"/>
+            <Label text="Sistema de control de inventario"
+                   wrapText="true"
+                   style="-fx-text-fill: #b8c8dc; -fx-font-size: 11px; -fx-padding: 8;"/>
+        </VBox>
+    </left>
 
-                    <VBox spacing="12" alignment="CENTER" maxWidth="420" style="-fx-background-color: #ffffff; -fx-padding: 25; -fx-background-radius: 8; -fx-border-color: #dcdde1; -fx-border-radius: 8;">
-                        <VBox spacing="4" alignment="CENTER_LEFT">
-                            <Label text="Nombre de usuario:" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
-                            <TextField fx:id="txtNuevoUsuario" promptText="Nombre de usuario (ej: vendedor1)" prefWidth="380"/>
+    <!-- Contenedor principal: ruta y regreso siempre disponibles -->
+    <center>
+        <BorderPane style="-fx-background-color: #f3f6fa;">
+            <top>
+                <HBox alignment="CENTER_LEFT" spacing="12"
+                      style="-fx-background-color: white; -fx-padding: 11 24; -fx-border-color: #e3e9f0; -fx-border-width: 0 0 1 0;">
+                    <Label text="PANEL" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold;"/>
+                    <Label text="/" style="-fx-text-fill: #94a3b8;"/>
+                    <Label fx:id="lblRuta" text="Inicio" style="-fx-text-fill: #203247; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button fx:id="btnVolver" text="← Regresar" onAction="#volverAtras"
+                            visible="false" managed="false"
+                            style="-fx-background-color: #e9f0f8; -fx-text-fill: #203247; -fx-font-weight: bold; -fx-background-radius: 7; -fx-padding: 8 17; -fx-cursor: hand;"/>
+                </HBox>
+            </top>
+            <center>
+                <StackPane fx:id="panelContenido" style="-fx-background-color: #f3f6fa;">
+            <children>
+                <!-- Única pantalla visible al iniciar sesión -->
+                <ScrollPane fx:id="vistaInicio" fitToWidth="true"
+                            style="-fx-background: #f3f6fa; -fx-background-color: transparent;">
+                    <content>
+                        <VBox alignment="TOP_LEFT" spacing="24"
+                              style="-fx-padding: 28 34; -fx-background-color: #f3f6fa;">
+                            <!-- Bienvenida personalizada: sin estadísticas inventadas -->
+                            <VBox spacing="10"
+                                  style="-fx-background-color: #e7f0fb; -fx-padding: 26 28; -fx-background-radius: 12; -fx-border-color: #c9ddf7; -fx-border-radius: 12;">
+                                <HBox spacing="10" alignment="CENTER_LEFT">
+                                    <Label text="CENTRO DE OPERACIONES"
+                                           style="-fx-text-fill: #2563eb; -fx-font-size: 11px; -fx-font-weight: bold;"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Label text="ACCESO ADMINISTRADOR"
+                                           style="-fx-text-fill: #30567f; -fx-font-size: 11px; -fx-font-weight: bold;"/>
+                                </HBox>
+                                <Label fx:id="lblBienvenida" text="¡Bienvenido!"
+                                       style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #203247;"/>
+                                <Label text="Gestioná inventario, ventas y usuarios desde un mismo lugar."
+                                       wrapText="true"
+                                       style="-fx-font-size: 14px; -fx-text-fill: #476581;"/>
+                                <Label fx:id="lblFechaActual" text="Fecha actual"
+                                       style="-fx-font-size: 12px; -fx-text-fill: #64748b;"/>
+                            </VBox>
+
+                            <HBox alignment="CENTER_LEFT" spacing="10">
+                                <Label text="Accesos rápidos"
+                                       style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #203247;"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label text="Elegí el módulo con el que querés trabajar"
+                                       style="-fx-font-size: 12px; -fx-text-fill: #64748b;"/>
+                            </HBox>
+                            <HBox spacing="18" alignment="TOP_LEFT">
+                                <VBox HBox.hgrow="ALWAYS" maxWidth="Infinity" spacing="15"
+                                      style="-fx-background-color: white; -fx-padding: 24; -fx-background-radius: 12; -fx-border-color: #e3e9f0; -fx-border-radius: 12;">
+                                    <Label text="INVENTARIO"
+                                           style="-fx-font-size: 17px; -fx-font-weight: bold; -fx-text-fill: #203247;"/>
+                                    <Label text="Consultá productos, tallas, colores y existencias."
+                                           wrapText="true"
+                                           style="-fx-text-fill: #65758b; -fx-font-size: 13px;"/>
+                                    <Button text="Abrir inventario" onAction="#mostrarInventario"
+                                            maxWidth="Infinity"
+                                            style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 11; -fx-cursor: hand; -fx-background-radius: 6;"/>
+                                </VBox>
+                                <VBox HBox.hgrow="ALWAYS" maxWidth="Infinity" spacing="15"
+                                      style="-fx-background-color: white; -fx-padding: 24; -fx-background-radius: 12; -fx-border-color: #e3e9f0; -fx-border-radius: 12;">
+                                    <Label text="VENTAS Y FACTURACIÓN"
+                                           wrapText="true"
+                                           style="-fx-font-size: 17px; -fx-font-weight: bold; -fx-text-fill: #203247;"/>
+                                    <Label text="Registrá ventas y utilizá la facturación existente."
+                                           wrapText="true"
+                                           style="-fx-text-fill: #65758b; -fx-font-size: 13px;"/>
+                                    <Button text="Abrir ventas" onAction="#mostrarVentas"
+                                            maxWidth="Infinity"
+                                            style="-fx-background-color: #0f9f75; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 11; -fx-cursor: hand; -fx-background-radius: 6;"/>
+                                </VBox>
+                                <VBox HBox.hgrow="ALWAYS" maxWidth="Infinity" spacing="15"
+                                      style="-fx-background-color: white; -fx-padding: 24; -fx-background-radius: 12; -fx-border-color: #e3e9f0; -fx-border-radius: 12;">
+                                    <Label text="USUARIOS"
+                                           style="-fx-font-size: 17px; -fx-font-weight: bold; -fx-text-fill: #203247;"/>
+                                    <Label text="Registrá nuevos usuarios con su rol correspondiente."
+                                           wrapText="true"
+                                           style="-fx-text-fill: #65758b; -fx-font-size: 13px;"/>
+                                    <Button text="Registrar usuario" onAction="#mostrarRegistro"
+                                            maxWidth="Infinity"
+                                            style="-fx-background-color: #7c3aed; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 11; -fx-cursor: hand; -fx-background-radius: 6;"/>
+                                </VBox>
+                            </HBox>
+                            <HBox spacing="18" alignment="TOP_LEFT">
+                                <VBox spacing="11" HBox.hgrow="ALWAYS" maxWidth="Infinity"
+                                      style="-fx-background-color: white; -fx-padding: 20 24; -fx-background-radius: 10; -fx-border-color: #e3e9f0; -fx-border-radius: 10;">
+                                    <Label text="¿CÓMO EMPEZAR?"
+                                           style="-fx-font-weight: bold; -fx-text-fill: #203247; -fx-font-size: 13px;"/>
+                                    <Label text="1. Revisá los productos y existencias en Inventario."
+                                           wrapText="true" style="-fx-text-fill: #65758b; -fx-font-size: 12px;"/>
+                                    <Label text="2. Consultá Ventas y facturación para operar."
+                                           wrapText="true" style="-fx-text-fill: #65758b; -fx-font-size: 12px;"/>
+                                    <Label text="3. Utilizá Usuarios para gestionar nuevos accesos."
+                                           wrapText="true" style="-fx-text-fill: #65758b; -fx-font-size: 12px;"/>
+                                </VBox>
+                                <VBox spacing="11" HBox.hgrow="ALWAYS" maxWidth="Infinity"
+                                      style="-fx-background-color: #eaf7f4; -fx-padding: 20 24; -fx-background-radius: 10; -fx-border-color: #ccebe3; -fx-border-radius: 10;">
+                                    <Label text="NAVEGACIÓN MÁS SENCILLA"
+                                           style="-fx-font-weight: bold; -fx-text-fill: #145848; -fx-font-size: 13px;"/>
+                                    <Label text="El menú lateral resalta siempre la sección en uso."
+                                           wrapText="true" style="-fx-text-fill: #326b5e; -fx-font-size: 12px;"/>
+                                    <Label text="Usá «Regresar» para volver a la pantalla anterior o «Inicio» para acceder a este panel."
+                                           wrapText="true" style="-fx-text-fill: #326b5e; -fx-font-size: 12px;"/>
+                                </VBox>
+                            </HBox>
                         </VBox>
+                    </content>
+                </ScrollPane>
 
-                        <VBox spacing="4" alignment="CENTER_LEFT">
-                            <Label text="Nombre completo:" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
-                            <TextField fx:id="txtNuevoNombreCompleto" promptText="Nombre y apellidos" prefWidth="380"/>
+                <!-- Se guarda en memoria, pero NO se muestra al iniciar -->
+                <ScrollPane fx:id="vistaRegistro" fitToWidth="true" fitToHeight="true"
+                            visible="false" managed="false"
+                            style="-fx-background: #f3f6fa; -fx-background-color: transparent;">
+                    <content>
+                        <VBox alignment="TOP_CENTER" spacing="18" style="-fx-padding: 30; -fx-background-color: #f3f6fa;">
+                            <Label text="Registro de nuevo usuario"
+                                   style="-fx-font-size: 23px; -fx-font-weight: bold; -fx-text-fill: #203247;"/>
+                            <Label text="Asigná un rol al nuevo usuario desde este formulario."
+                                   style="-fx-text-fill: #65758b; -fx-font-size: 13px;"/>
+                            <VBox spacing="12" alignment="CENTER" maxWidth="450"
+                                  style="-fx-background-color: white; -fx-padding: 28; -fx-background-radius: 10; -fx-border-color: #e3e9f0; -fx-border-radius: 10;">
+                                <VBox spacing="4" alignment="CENTER_LEFT">
+                                    <Label text="Nombre de usuario:" style="-fx-font-weight: bold;"/>
+                                    <TextField fx:id="txtNuevoUsuario" promptText="Ejemplo: vendedor1" prefWidth="380"/>
+                                </VBox>
+                                <VBox spacing="4" alignment="CENTER_LEFT">
+                                    <Label text="Nombre completo:" style="-fx-font-weight: bold;"/>
+                                    <TextField fx:id="txtNuevoNombreCompleto" promptText="Nombre y apellidos" prefWidth="380"/>
+                                </VBox>
+                                <VBox spacing="4" alignment="CENTER_LEFT">
+                                    <Label text="Correo electrónico:" style="-fx-font-weight: bold;"/>
+                                    <TextField fx:id="txtNuevoCorreo" promptText="correo@ejemplo.com" prefWidth="380"/>
+                                </VBox>
+                                <VBox spacing="4" alignment="CENTER_LEFT">
+                                    <Label text="Contraseña:" style="-fx-font-weight: bold;"/>
+                                    <PasswordField fx:id="txtNuevoPassword" promptText="Contraseña" prefWidth="380"/>
+                                </VBox>
+                                <VBox spacing="4" alignment="CENTER_LEFT">
+                                    <Label text="Rol:" style="-fx-font-weight: bold;"/>
+                                    <ComboBox fx:id="cmbNuevoRol" promptText="Seleccionar rol..." prefWidth="380"/>
+                                </VBox>
+                                <Button text="Guardar usuario" onAction="#handleRegistrarUsuario"
+                                        maxWidth="Infinity"
+                                        style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 12 20; -fx-cursor: hand; -fx-background-radius: 6;"/>
+                                <Label fx:id="lblMensajeRegistro" wrapText="true" maxWidth="380" alignment="CENTER"/>
+                            </VBox>
                         </VBox>
-
-                        <VBox spacing="4" alignment="CENTER_LEFT">
-                            <Label text="Correo electrónico:" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
-                            <TextField fx:id="txtNuevoCorreo" promptText="correo@ejemplo.com" prefWidth="380"/>
-                        </VBox>
-
-                        <VBox spacing="4" alignment="CENTER_LEFT">
-                            <Label text="Contraseña:" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
-                            <PasswordField fx:id="txtNuevoPassword" promptText="Contraseña" prefWidth="380"/>
-                        </VBox>
-
-                        <VBox spacing="4" alignment="CENTER_LEFT">
-                            <Label text="Rol:" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
-                            <ComboBox fx:id="cmbNuevoRol" promptText="Seleccionar rol..." prefWidth="380"/>
-                        </VBox>
-
-                        <Button fx:id="btnGuardarUsuario" text="Guardar Usuario" onAction="#handleRegistrarUsuario"
-                                style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 20; -fx-cursor: hand; -fx-background-radius: 4;"
-                                maxWidth="Infinity"/>
-
-                        <Label fx:id="lblMensajeRegistro" wrapText="true" maxWidth="380" alignment="CENTER"/>
-                    </VBox>
-                </VBox>
-            </ScrollPane>
-        </Tab>
-    </TabPane>
-</VBox>
+                    </content>
+                </ScrollPane>
+            </children>
+                </StackPane>
+            </center>
+        </BorderPane>
+    </center>
+</BorderPane>
