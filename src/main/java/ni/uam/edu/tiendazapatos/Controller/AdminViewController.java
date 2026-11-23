@@ -1,7 +1,6 @@
 package ni.uam.edu.tiendazapatos.Controller;
 
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -10,29 +9,20 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import javafx.util.StringConverter;
 import ni.uam.edu.tiendazapatos.config.SesionUsuario;
-import ni.uam.edu.tiendazapatos.dao.RolDAO;
-import ni.uam.edu.tiendazapatos.dao.UsuarioDAO;
-import ni.uam.edu.tiendazapatos.modelo.Rol;
 import ni.uam.edu.tiendazapatos.modelo.Usuario;
 
 import java.io.IOException;
+import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Locale;
-import java.net.URL;
-import java.time.LocalDateTime;
-import java.util.List;
 
 public class AdminViewController {
 
@@ -42,36 +32,27 @@ public class AdminViewController {
     @FXML private Button btnNavInicio;
     @FXML private Button btnNavInventario;
     @FXML private Button btnNavVentas;
+    @FXML private Button btnNavHistorialVentas;
     @FXML private Button btnNavUsuarios;
     @FXML private Button btnVolver;
     @FXML private Label lblRuta;
     @FXML private Label lblFechaActual;
     @FXML private StackPane panelContenido;
     @FXML private ScrollPane vistaInicio;
-    @FXML private ScrollPane vistaRegistro;
 
-    // Formulario existente de registro de usuarios
-    @FXML private TextField txtNuevoUsuario;
-    @FXML private TextField txtNuevoNombreCompleto;
-    @FXML private TextField txtNuevoCorreo;
-    @FXML private PasswordField txtNuevoPassword;
-    @FXML private ComboBox<Rol> cmbNuevoRol;
-    @FXML private Label lblMensajeRegistro;
-
-    private final UsuarioDAO usuarioDAO = new UsuarioDAO();
-    private final RolDAO rolDAO = new RolDAO();
-
-    // Se cargan cuando se seleccionan; no al iniciar sesion.
+    // Vistas cargadas dinámicamente bajo demanda
     private Parent vistaInventario;
     private Parent vistaVentas;
+    private Parent vistaHistorialVentas;
+    private Parent vistaUsuarios;
 
-    private enum Seccion { INICIO, INVENTARIO, VENTAS, USUARIOS }
+    private enum Seccion { INICIO, INVENTARIO, VENTAS, HISTORIAL_VENTAS, USUARIOS }
     private Seccion seccionActual = Seccion.INICIO;
     private final Deque<Seccion> historial = new ArrayDeque<>();
 
     private static final String ESTILO_NAV_BASE =
             "-fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 7; " +
-            "-fx-padding: 14 16; -fx-font-size: 14px; ";
+            "-fx-padding: 12 16; -fx-font-size: 14px; ";
 
     @FXML
     public void initialize() {
@@ -98,10 +79,6 @@ public class AdminViewController {
         lblFechaActual.setText("Hoy es " + LocalDate.now().format(
                 DateTimeFormatter.ofPattern("EEEE d 'de' MMMM 'de' yyyy", new Locale("es", "NI"))));
 
-        // El formulario permanece en memoria, pero se abre solo al seleccionarlo.
-        panelContenido.getChildren().remove(vistaRegistro);
-        configurarComboRoles();
-        cargarRoles();
         actualizarNavegacion();
     }
 
@@ -124,11 +101,20 @@ public class AdminViewController {
     }
 
     @FXML
-    private void mostrarRegistro() {
+    private void mostrarHistorialVentas() {
+        cambiarSeccion(Seccion.HISTORIAL_VENTAS, true);
+    }
+
+    @FXML
+    private void mostrarUsuarios() {
         cambiarSeccion(Seccion.USUARIOS, true);
     }
 
-    // Regresa a la sección anterior (no simplemente a Inicio).
+    @FXML
+    private void mostrarRegistro() {
+        mostrarUsuarios();
+    }
+
     @FXML
     private void volverAtras() {
         if (historial.isEmpty()) {
@@ -164,7 +150,6 @@ public class AdminViewController {
     private Node obtenerVista(Seccion seccion) throws IOException {
         return switch (seccion) {
             case INICIO -> vistaInicio;
-            case USUARIOS -> vistaRegistro;
             case INVENTARIO -> {
                 if (vistaInventario == null) vistaInventario = cargarVista("ZapatosView.fxml");
                 yield vistaInventario;
@@ -173,6 +158,14 @@ public class AdminViewController {
                 if (vistaVentas == null) vistaVentas = cargarVista("VentasView.fxml");
                 yield vistaVentas;
             }
+            case HISTORIAL_VENTAS -> {
+                if (vistaHistorialVentas == null) vistaHistorialVentas = cargarVista("HistorialVentasView.fxml");
+                yield vistaHistorialVentas;
+            }
+            case USUARIOS -> {
+                if (vistaUsuarios == null) vistaUsuarios = cargarVista("GestionUsuariosView.fxml");
+                yield vistaUsuarios;
+            }
         };
     }
 
@@ -180,8 +173,9 @@ public class AdminViewController {
         return switch (seccion) {
             case INICIO -> "Inicio";
             case INVENTARIO -> "Inventario";
-            case VENTAS -> "Ventas y facturación";
-            case USUARIOS -> "Registrar usuario";
+            case VENTAS -> "Facturación";
+            case HISTORIAL_VENTAS -> "Historial de ventas";
+            case USUARIOS -> "Gestión de usuarios";
         };
     }
 
@@ -189,6 +183,7 @@ public class AdminViewController {
         marcarActivo(btnNavInicio, seccionActual == Seccion.INICIO);
         marcarActivo(btnNavInventario, seccionActual == Seccion.INVENTARIO);
         marcarActivo(btnNavVentas, seccionActual == Seccion.VENTAS);
+        marcarActivo(btnNavHistorialVentas, seccionActual == Seccion.HISTORIAL_VENTAS);
         marcarActivo(btnNavUsuarios, seccionActual == Seccion.USUARIOS);
 
         lblRuta.setText(nombreSeccion(seccionActual));
@@ -198,6 +193,7 @@ public class AdminViewController {
     }
 
     private void marcarActivo(Button boton, boolean activo) {
+        if (boton == null) return;
         boton.setStyle(ESTILO_NAV_BASE + (activo
                 ? "-fx-background-color: #45678b; -fx-font-weight: bold; " +
                   "-fx-border-color: #8fc0ff; -fx-border-width: 0 0 0 4; -fx-border-radius: 7;"
@@ -218,88 +214,8 @@ public class AdminViewController {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error de navegación");
         alert.setHeaderText(mensaje);
-        alert.setContentText(e.getMessage() != null ? e.getMessage() : e.toString());
+        alert.setContentText(e != null ? e.getMessage() : "Error desconocido");
         alert.showAndWait();
-    }
-
-    private void configurarComboRoles() {
-        cmbNuevoRol.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(Rol rol) {
-                return rol != null ? rol.getNombre() : "";
-            }
-
-            @Override
-            public Rol fromString(String string) {
-                return null;
-            }
-        });
-    }
-
-    private void cargarRoles() {
-        try {
-            List<Rol> roles = rolDAO.obtenerTodos();
-            cmbNuevoRol.setItems(FXCollections.observableArrayList(roles));
-        } catch (Exception e) {
-            e.printStackTrace();
-            lblMensajeRegistro.setStyle("-fx-text-fill: red;");
-            lblMensajeRegistro.setText("Error al cargar roles de la base de datos.");
-        }
-    }
-
-    @FXML
-    private void handleRegistrarUsuario() {
-        String usuario = txtNuevoUsuario.getText() != null ? txtNuevoUsuario.getText().trim() : "";
-        String nombreCompleto = txtNuevoNombreCompleto.getText() != null ? txtNuevoNombreCompleto.getText().trim() : "";
-        String correo = txtNuevoCorreo.getText() != null ? txtNuevoCorreo.getText().trim() : "";
-        String password = txtNuevoPassword.getText() != null ? txtNuevoPassword.getText() : "";
-        Rol rolSeleccionado = cmbNuevoRol.getValue();
-
-        if (usuario.isEmpty() || nombreCompleto.isEmpty() || correo.isEmpty()
-                || password.isEmpty() || rolSeleccionado == null) {
-            lblMensajeRegistro.setStyle("-fx-text-fill: red;");
-            lblMensajeRegistro.setText("Por favor, completa todos los campos requeridos.");
-            return;
-        }
-
-        try {
-            if (usuarioDAO.buscarPorNombreUsuario(usuario) != null) {
-                lblMensajeRegistro.setStyle("-fx-text-fill: red;");
-                lblMensajeRegistro.setText("El nombre de usuario '" + usuario + "' ya está registrado.");
-                return;
-            }
-
-            if (usuarioDAO.buscarPorCorreo(correo) != null) {
-                lblMensajeRegistro.setStyle("-fx-text-fill: red;");
-                lblMensajeRegistro.setText("El correo electrónico '" + correo + "' ya está registrado.");
-                return;
-            }
-
-            Usuario nuevoUsuario = new Usuario();
-            nuevoUsuario.setNombreUsuario(usuario);
-            nuevoUsuario.setNombreCompleto(nombreCompleto);
-            nuevoUsuario.setCorreo(correo);
-            // Se conserva el comportamiento actual del proyecto. Pendiente: hash seguro.
-            nuevoUsuario.setPasswordHash(password);
-            nuevoUsuario.setRol(rolSeleccionado);
-            nuevoUsuario.setActivo(true);
-            nuevoUsuario.setCreadoEn(LocalDateTime.now());
-            usuarioDAO.guardar(nuevoUsuario);
-
-            lblMensajeRegistro.setStyle("-fx-text-fill: green;");
-            lblMensajeRegistro.setText("¡Usuario '" + usuario + "' registrado exitosamente con rol "
-                    + rolSeleccionado.getNombre() + "!");
-
-            txtNuevoUsuario.clear();
-            txtNuevoNombreCompleto.clear();
-            txtNuevoCorreo.clear();
-            txtNuevoPassword.clear();
-            cmbNuevoRol.getSelectionModel().clearSelection();
-        } catch (Exception e) {
-            lblMensajeRegistro.setStyle("-fx-text-fill: red;");
-            lblMensajeRegistro.setText("Error al guardar: " + e.getMessage());
-            e.printStackTrace();
-        }
     }
 
     @FXML

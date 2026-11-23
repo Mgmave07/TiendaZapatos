@@ -29,6 +29,21 @@ public class Venta {
     @Column(name = "metodo_pago")
     private String metodoPago;
 
+    @Column(name = "vendedor_id")
+    private UUID vendedorId;
+
+    @Column(name = "cliente_nombre", length = 150)
+    private String clienteNombre;
+
+    @Column(name = "cliente_identificacion", length = 50)
+    private String clienteIdentificacion;
+
+    @Column(name = "cliente_telefono", length = 20)
+    private String clienteTelefono;
+
+    @Column(name = "notas")
+    private String notas;
+
     @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL)
     private List<DetalleVenta> detalles;
 
@@ -105,5 +120,45 @@ public class Venta {
 
     public void setDetalles(List<DetalleVenta> detalles) {
         this.detalles = detalles;
+    }
+
+    public UUID getVendedorId() {
+        return vendedorId;
+    }
+
+    public void setVendedorId(UUID vendedorId) {
+        this.vendedorId = vendedorId;
+    }
+
+    public String getClienteNombre() {
+        return clienteNombre;
+    }
+
+    public void setClienteNombre(String clienteNombre) {
+        this.clienteNombre = clienteNombre;
+    }
+
+    public String getClienteIdentificacion() {
+        return clienteIdentificacion;
+    }
+
+    public void setClienteIdentificacion(String clienteIdentificacion) {
+        this.clienteIdentificacion = clienteIdentificacion;
+    }
+
+    public String getClienteTelefono() {
+        return clienteTelefono;
+    }
+
+    public void setClienteTelefono(String clienteTelefono) {
+        this.clienteTelefono = clienteTelefono;
+    }
+
+    public String getNotas() {
+        return notas;
+    }
+
+    public void setNotas(String notas) {
+        this.notas = notas;
     }
 }

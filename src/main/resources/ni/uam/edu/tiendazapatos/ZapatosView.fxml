@@ -4,27 +4,54 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox alignment="TOP_CENTER" spacing="14.0" prefWidth="1200" prefHeight="690"
+<VBox alignment="TOP_CENTER" spacing="12.0" prefWidth="1200" prefHeight="700"
       xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="ni.uam.edu.tiendazapatos.Controller.ZapatosViewController">
     <padding>
-        <Insets top="20" bottom="20" left="20" right="20"/>
+        <Insets top="18" bottom="18" left="20" right="20"/>
     </padding>
 
-    <Label text="Inventario de Zapatos" style="-fx-font-size: 25px; -fx-font-weight: bold;"/>
-    <Label text="Control por género, sistema de tallas, color y existencias"
+    <Label text="Inventario de Zapatos" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+    <Label text="Control por modelo, marca, talla, stock, rango de precios y género"
            style="-fx-font-size: 13px; -fx-text-fill: #606060;"/>
 
-    <HBox spacing="12" alignment="CENTER_LEFT">
-        <TextField fx:id="txtBuscar" promptText="Buscar modelo, marca, SKU, talla o ID..."
-                   HBox.hgrow="ALWAYS"/>
-        <Label text="Género:"/>
-        <ComboBox fx:id="cmbGenero" prefWidth="140"/>
-        <CheckBox fx:id="chkSoloDisponibles" text="Solo disponibles"/>
-        <Button text="Actualizar" onAction="#handleActualizar"/>
-    </HBox>
+    <!-- Panel de filtros de búsqueda avanzados por separado -->
+    <VBox spacing="10" style="-fx-background-color: #f8fafc; -fx-padding: 12 16; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+        <!-- Fila 1: Modelo, Marca, Talla, Género -->
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <Label text="Modelo:" style="-fx-font-weight: bold;"/>
+            <TextField fx:id="txtModelo" promptText="Buscar por nombre de modelo..." HBox.hgrow="ALWAYS"/>
 
-    <TableView fx:id="tablaZapatos" VBox.vgrow="ALWAYS" prefHeight="460">
+            <Label text="Marca:" style="-fx-font-weight: bold;"/>
+            <ComboBox fx:id="cmbMarca" prefWidth="150"/>
+
+            <Label text="Talla:" style="-fx-font-weight: bold;"/>
+            <TextField fx:id="txtTalla" promptText="Ej. 40, 9..." prefWidth="95"/>
+
+            <Label text="Género:" style="-fx-font-weight: bold;"/>
+            <ComboBox fx:id="cmbGenero" prefWidth="120"/>
+        </HBox>
+
+        <!-- Fila 2: Stock, Rango de Precio (Mín/Máx), Limpiar y Actualizar -->
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <Label text="Stock:" style="-fx-font-weight: bold;"/>
+            <ComboBox fx:id="cmbStock" prefWidth="155"/>
+
+            <Label text="Rango de Precio:" style="-fx-font-weight: bold;"/>
+            <TextField fx:id="txtPrecioMin" promptText="Mín (C$)" prefWidth="95"/>
+            <Label text="—"/>
+            <TextField fx:id="txtPrecioMax" promptText="Máx (C$)" prefWidth="95"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <Button text="Limpiar Filtros" onAction="#handleLimpiarFiltros"
+                    style="-fx-background-color: #64748b; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 5; -fx-padding: 6 14;"/>
+            <Button text="Actualizar" onAction="#handleActualizar"
+                    style="-fx-background-color: #0284c7; -fx-text-fill: white; -fx-cursor: hand; -fx-font-weight: bold; -fx-background-radius: 5; -fx-padding: 6 16;"/>
+        </HBox>
+    </VBox>
+
+    <TableView fx:id="tablaZapatos" VBox.vgrow="ALWAYS" prefHeight="420">
         <columns>
             <TableColumn fx:id="colNombre" text="Modelo" prefWidth="145"/>
             <TableColumn fx:id="colMarca" text="Marca" prefWidth="95"/>
@@ -41,12 +68,12 @@
 
     <HBox spacing="12" alignment="CENTER">
         <Button fx:id="btnVerDetalles" text="Ver Detalles" onAction="#handleVerDetalles"
-                style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-padding: 10 20;"/>
+                style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-padding: 10 20; -fx-background-radius: 6; -fx-cursor: hand;"/>
         <Button fx:id="btnEditar" text="Editar" onAction="#handleEditarZapato"
-                style="-fx-background-color: #FF9800; -fx-text-fill: white; -fx-padding: 10 20;"/>
+                style="-fx-background-color: #FF9800; -fx-text-fill: white; -fx-padding: 10 20; -fx-background-radius: 6; -fx-cursor: hand;"/>
         <Button text="+ Agregar Zapato" onAction="#handleAgregarZapato"
-                style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 10 20;"/>
+                style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 10 20; -fx-background-radius: 6; -fx-cursor: hand;"/>
         <Button text="Cerrar Sesión" onAction="#handleCerrarSesion"
-                style="-fx-background-color: #f44336; -fx-text-fill: white; -fx-padding: 10 20;"/>
+                style="-fx-background-color: #f44336; -fx-text-fill: white; -fx-padding: 10 20; -fx-background-radius: 6; -fx-cursor: hand;"/>
     </HBox>
 </VBox>

@@ -70,4 +70,60 @@ public class UsuarioDAO {
             em.close();
         }
     }
+
+    public java.util.List<Usuario> obtenerTodos() {
+        EntityManager em = HibernateUtil.getEntityManager();
+        try {
+            TypedQuery<Usuario> query = em.createQuery(
+                    "SELECT u FROM Usuario u LEFT JOIN FETCH u.rol ORDER BY u.nombreUsuario",
+                    Usuario.class
+            );
+            return query.getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new java.util.ArrayList<>();
+        } finally {
+            em.close();
+        }
+    }
+
+    public void actualizar(Usuario usuario) {
+        EntityManager em = HibernateUtil.getEntityManager();
+        try {
+            em.getTransaction().begin();
+            em.merge(usuario);
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            e.printStackTrace();
+            throw new RuntimeException("Error al actualizar usuario: " + e.getMessage(), e);
+        } finally {
+            em.close();
+        }
+    }
+
+    public boolean eliminar(java.util.UUID usuarioId) {
+        EntityManager em = HibernateUtil.getEntityManager();
+        try {
+            em.getTransaction().begin();
+            Usuario usuario = em.find(Usuario.class, usuarioId);
+            if (usuario != null) {
+                em.remove(usuario);
+                em.getTransaction().commit();
+                return true;
+            }
+            em.getTransaction().rollback();
+            return false;
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            e.printStackTrace();
+            throw new RuntimeException("Error al eliminar usuario: " + e.getMessage(), e);
+        } finally {
+            em.close();
+        }
+    }
 }

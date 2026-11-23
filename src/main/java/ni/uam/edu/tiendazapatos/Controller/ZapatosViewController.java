@@ -18,8 +18,10 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import ni.uam.edu.tiendazapatos.config.SesionUsuario;
 import ni.uam.edu.tiendazapatos.dao.InventarioDAO;
+import ni.uam.edu.tiendazapatos.dao.MarcaDAO;
 import ni.uam.edu.tiendazapatos.dao.ZapatoDAO;
 import ni.uam.edu.tiendazapatos.modelo.InventarioFila;
+import ni.uam.edu.tiendazapatos.modelo.Marca;
 import ni.uam.edu.tiendazapatos.modelo.Zapato;
 
 import java.io.IOException;
@@ -44,14 +46,21 @@ public class ZapatosViewController {
     @FXML private TableColumn<InventarioFila, String> colVentas;
     @FXML private TableColumn<InventarioFila, String> colEstado;
 
-    @FXML private TextField txtBuscar;
+    // Filtros separados
+    @FXML private TextField txtModelo;
+    @FXML private ComboBox<String> cmbMarca;
+    @FXML private TextField txtTalla;
+    @FXML private ComboBox<String> cmbStock;
     @FXML private ComboBox<String> cmbGenero;
-    @FXML private CheckBox chkSoloDisponibles;
+    @FXML private TextField txtPrecioMin;
+    @FXML private TextField txtPrecioMax;
+
     @FXML private Button btnVerDetalles;
     @FXML private Button btnEditar;
 
     private final ZapatoDAO zapatoDAO = new ZapatoDAO();
     private final InventarioDAO inventarioDAO = new InventarioDAO();
+    private final MarcaDAO marcaDAO = new MarcaDAO();
     private final ObservableList<InventarioFila> filas = FXCollections.observableArrayList();
     private final FilteredList<InventarioFila> filtradas = new FilteredList<>(filas, fila -> true);
 
@@ -73,17 +82,60 @@ public class ZapatosViewController {
                 ? "0" : c.getValue().zapato().getVolumenVentas().toString()));
         colEstado.setCellValueFactory(c -> texto(estado(c.getValue())));
 
-        cmbGenero.getItems().setAll("Todos", "HOMBRE", "MUJER", "UNISEX");
-        cmbGenero.getSelectionModel().selectFirst();
-        txtBuscar.textProperty().addListener((obs, anterior, nuevo) -> aplicarFiltros());
-        cmbGenero.valueProperty().addListener((obs, anterior, nuevo) -> aplicarFiltros());
-        chkSoloDisponibles.selectedProperty().addListener((obs, anterior, nuevo) -> aplicarFiltros());
+        configurarFiltros();
 
         SortedList<InventarioFila> ordenadas = new SortedList<>(filtradas);
         ordenadas.comparatorProperty().bind(tablaZapatos.comparatorProperty());
         tablaZapatos.setItems(ordenadas);
 
         cargarZapatos();
+    }
+
+    private void configurarFiltros() {
+        cargarMarcas();
+
+        cmbStock.getItems().setAll("Todos", "Disponibles (>0)", "Agotados (=0)", "Bajo stock (≤5)");
+        cmbStock.getSelectionModel().selectFirst();
+
+        cmbGenero.getItems().setAll("Todos", "HOMBRE", "MUJER", "UNISEX");
+        cmbGenero.getSelectionModel().selectFirst();
+
+        txtModelo.textProperty().addListener((obs, anterior, nuevo) -> aplicarFiltros());
+        cmbMarca.valueProperty().addListener((obs, anterior, nuevo) -> aplicarFiltros());
+        txtTalla.textProperty().addListener((obs, anterior, nuevo) -> aplicarFiltros());
+        cmbStock.valueProperty().addListener((obs, anterior, nuevo) -> aplicarFiltros());
+        cmbGenero.valueProperty().addListener((obs, anterior, nuevo) -> aplicarFiltros());
+
+        txtPrecioMin.textProperty().addListener((obs, anterior, nuevo) -> {
+            if (!nuevo.matches("\\d*(\\.\\d*)?")) {
+                txtPrecioMin.setText(anterior);
+            } else {
+                aplicarFiltros();
+            }
+        });
+
+        txtPrecioMax.textProperty().addListener((obs, anterior, nuevo) -> {
+            if (!nuevo.matches("\\d*(\\.\\d*)?")) {
+                txtPrecioMax.setText(anterior);
+            } else {
+                aplicarFiltros();
+            }
+        });
+    }
+
+    private void cargarMarcas() {
+        List<Marca> marcas = marcaDAO.obtenerTodas();
+        List<String> nombresMarcas = new ArrayList<>();
+        nombresMarcas.add("Todas");
+        if (marcas != null) {
+            for (Marca m : marcas) {
+                if (m.getNombre() != null && !m.getNombre().isBlank()) {
+                    nombresMarcas.add(m.getNombre());
+                }
+            }
+        }
+        cmbMarca.getItems().setAll(nombresMarcas);
+        cmbMarca.getSelectionModel().selectFirst();
     }
 
     private static ReadOnlyStringWrapper texto(String valor) {
@@ -113,6 +165,7 @@ public class ZapatosViewController {
                 } else {
                     for (InventarioDAO.Variante variante : variantes) {
                         filas.add(new InventarioFila(
+                                variante.inventarioId(),
                                 zapato,
                                 variante.genero(),
                                 variante.sistemaTalla(),
@@ -131,26 +184,107 @@ public class ZapatosViewController {
     }
 
     private void aplicarFiltros() {
-        String buscar = txtBuscar.getText() == null ? "" :
-                txtBuscar.getText().trim().toLowerCase(Locale.ROOT);
-        String genero = cmbGenero.getValue();
-        boolean soloDisponibles = chkSoloDisponibles.isSelected();
+        String modelo = txtModelo.getText() == null ? "" : txtModelo.getText().trim().toLowerCase(Locale.ROOT);
+        String marcaSel = cmbMarca.getValue();
+        String tallaFiltro = txtTalla.getText() == null ? "" : txtTalla.getText().trim().toLowerCase(Locale.ROOT);
+        String stockSel = cmbStock.getValue();
+        String generoSel = cmbGenero.getValue();
+        String minStr = txtPrecioMin.getText() == null ? "" : txtPrecioMin.getText().trim();
+        String maxStr = txtPrecioMax.getText() == null ? "" : txtPrecioMax.getText().trim();
+
+        Double minPrecio = null;
+        Double maxPrecio = null;
+        try {
+            if (!minStr.isEmpty()) minPrecio = Double.parseDouble(minStr);
+        } catch (NumberFormatException ignored) {}
+        try {
+            if (!maxStr.isEmpty()) maxPrecio = Double.parseDouble(maxStr);
+        } catch (NumberFormatException ignored) {}
+
+        final Double finalMin = minPrecio;
+        final Double finalMax = maxPrecio;
 
         filtradas.setPredicate(fila -> {
-            if (genero != null && !"Todos".equals(genero)
-                    && !genero.equalsIgnoreCase(fila.genero())) return false;
-            if (soloDisponibles && (fila.stock() == null || fila.stock() <= 0
-                    || !Boolean.TRUE.equals(fila.zapato().getActivo()))) return false;
+            // 1. Filtro por nombre de modelo
+            if (!modelo.isEmpty()) {
+                String nombreZapato = fila.zapato() != null && fila.zapato().getNombre() != null
+                        ? fila.zapato().getNombre().toLowerCase(Locale.ROOT) : "";
+                if (!nombreZapato.contains(modelo)) {
+                    return false;
+                }
+            }
 
-            String contenido = String.join(" ",
-                    valor(fila.zapato().getNombre()),
-                    fila.zapato().getMarca() == null ? "" : valor(fila.zapato().getMarca().getNombre()),
-                    valor(fila.talla()), valor(fila.color()),
-                    valor(fila.genero()), valor(fila.sistemaTalla()),
-                    fila.zapato().getZapatoId().toString()
-            ).toLowerCase(Locale.ROOT);
-            return contenido.contains(buscar);
+            // 2. Filtro por marca
+            if (marcaSel != null && !"Todas".equalsIgnoreCase(marcaSel) && !marcaSel.isBlank()) {
+                String marcaZapato = fila.zapato() != null && fila.zapato().getMarca() != null
+                        ? fila.zapato().getMarca().getNombre() : "";
+                if (!marcaSel.equalsIgnoreCase(marcaZapato)) {
+                    return false;
+                }
+            }
+
+            // 3. Filtro por talla
+            if (!tallaFiltro.isEmpty()) {
+                String tallaZapato = fila.talla() == null ? "" : fila.talla().toLowerCase(Locale.ROOT);
+                if (!tallaZapato.contains(tallaFiltro)) {
+                    return false;
+                }
+            }
+
+            // 4. Filtro por stock
+            if (stockSel != null && !"Todos".equalsIgnoreCase(stockSel)) {
+                int stockVal = fila.stock() == null ? 0 : fila.stock();
+                boolean activo = fila.zapato() != null && Boolean.TRUE.equals(fila.zapato().getActivo());
+
+                if (stockSel.contains("Disponibles")) {
+                    if (stockVal <= 0 || !activo) return false;
+                } else if (stockSel.contains("Agotados")) {
+                    if (stockVal > 0) return false;
+                } else if (stockSel.contains("bajo") || stockSel.contains("Bajo")) {
+                    if (stockVal <= 0 || stockVal > 5) return false;
+                }
+            }
+
+            // 5. Filtro por rango de precio
+            Double precioFinal = fila.zapato() != null && fila.zapato().getPrecioFinal() != null
+                    ? fila.zapato().getPrecioFinal().doubleValue() : null;
+
+            if (finalMin != null) {
+                if (precioFinal == null || precioFinal < finalMin) {
+                    return false;
+                }
+            }
+            if (finalMax != null) {
+                if (precioFinal == null || precioFinal > finalMax) {
+                    return false;
+                }
+            }
+
+            // 6. Filtro por género
+            if (generoSel != null && !"Todos".equalsIgnoreCase(generoSel) && !generoSel.isBlank()) {
+                if (!generoSel.equalsIgnoreCase(fila.genero())) {
+                    return false;
+                }
+            }
+
+            return true;
         });
+    }
+
+    @FXML
+    private void handleLimpiarFiltros() {
+        txtModelo.clear();
+        if (cmbMarca.getItems().contains("Todas")) {
+            cmbMarca.setValue("Todas");
+        } else {
+            cmbMarca.getSelectionModel().selectFirst();
+        }
+        txtTalla.clear();
+        cmbStock.getSelectionModel().selectFirst();
+        cmbGenero.getSelectionModel().selectFirst();
+        txtPrecioMin.clear();
+        txtPrecioMax.clear();
+        aplicarFiltros();
     }
 
     private static String valor(String texto) {

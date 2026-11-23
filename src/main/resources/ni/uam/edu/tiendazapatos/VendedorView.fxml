@@ -4,31 +4,179 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox alignment="CENTER" spacing="20.0" prefWidth="800" prefHeight="550"
-      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="ni.uam.edu.tiendazapatos.Controller.VendedorViewController"
-      style="-fx-background-color: #f8f9fa;">
-    <padding>
-        <Insets top="40" bottom="40" left="40" right="40"/>
-    </padding>
+<BorderPane prefWidth="1200.0" prefHeight="750.0"
+            xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="ni.uam.edu.tiendazapatos.Controller.VendedorViewController">
 
-    <!-- Título de bienvenida -->
-    <Label text="👋 Vista de Vendedor"
-           style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+    <!-- HEADER SUPERIOR -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="20"
+              style="-fx-background-color: #0f172a; -fx-padding: 14 24;">
+            <Label text="TIENDA DE ZAPATOS | Panel de Vendedor"
+                   style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="lblUsuarioHeader" text="Vendedor"
+                   style="-fx-text-fill: #94a3b8; -fx-font-size: 13px;"/>
+            <Button text="Cerrar Sesión" onAction="#handleCerrarSesion"
+                    style="-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-weight: bold;
+                           -fx-cursor: hand; -fx-background-radius: 6; -fx-padding: 7 16;"/>
+        </HBox>
+    </top>
 
-    <Label fx:id="lblBienvenida" text="¡Bienvenido al sistema!"
-           style="-fx-font-size: 18px; -fx-text-fill: #34495e;"/>
+    <!-- SIDEBAR NAVEGACIÓN -->
+    <left>
+        <VBox spacing="6" style="-fx-background-color: #1e293b; -fx-padding: 18 12; -fx-pref-width: 240;">
+            <Label text="NAVEGACIÓN"
+                   style="-fx-text-fill: #64748b; -fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 0 10 8 10;"/>
 
-    <Label text="Seleccione una opción para comenzar a operar"
-           style="-fx-font-size: 14px; -fx-text-fill: #7f8c8d;"/>
+            <Button fx:id="btnNavInicio" text="⌂   Inicio" onAction="#handleNavInicio"
+                    maxWidth="Infinity" prefHeight="42"
+                    style="-fx-background-color: #0284c7; -fx-text-fill: white; -fx-font-weight: bold;
+                           -fx-alignment: CENTER_LEFT; -fx-padding: 0 16; -fx-cursor: hand; -fx-background-radius: 7;"/>
 
-    <Region prefHeight="20"/>
+            <Button fx:id="btnNavVenta" text="▤   Punto de Venta" onAction="#handleNavVenta"
+                    maxWidth="Infinity" prefHeight="42"
+                    style="-fx-background-color: transparent; -fx-text-fill: #cbd5e1;
+                           -fx-alignment: CENTER_LEFT; -fx-padding: 0 16; -fx-cursor: hand; -fx-background-radius: 7;"/>
 
-    <!-- Botón principal de Facturación -->
-    <Button fx:id="btnAbrirVentas" text="Realizar Venta / Facturar" onAction="#handleAbrirVentas"
-            style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-padding: 12 30; -fx-background-radius: 5; -fx-cursor: hand;"/>
+            <Button fx:id="btnNavBuscador" text="🔍   Buscador de Calzado" onAction="#handleNavBuscador"
+                    maxWidth="Infinity" prefHeight="42"
+                    style="-fx-background-color: transparent; -fx-text-fill: #cbd5e1;
+                           -fx-alignment: CENTER_LEFT; -fx-padding: 0 16; -fx-cursor: hand; -fx-background-radius: 7;"/>
 
-    <!-- Botón de cerrar sesión -->
-    <Button fx:id="btnCerrarSesion" text="Cerrar Sesión" onAction="#handleCerrarSesion"
-            style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10 25; -fx-background-radius: 5; -fx-cursor: hand;"/>
-</VBox>
+            <Button fx:id="btnNavMisVentas" text="📜   Mis Ventas del Día" onAction="#handleNavMisVentas"
+                    maxWidth="Infinity" prefHeight="42"
+                    style="-fx-background-color: transparent; -fx-text-fill: #cbd5e1;
+                           -fx-alignment: CENTER_LEFT; -fx-padding: 0 16; -fx-cursor: hand; -fx-background-radius: 7;"/>
+
+            <Region VBox.vgrow="ALWAYS"/>
+            <Separator style="-fx-background-color: #334155;"/>
+            <Label text="Tienda de Zapatos v1.0"
+                   style="-fx-text-fill: #475569; -fx-font-size: 11px; -fx-padding: 8 10;"/>
+        </VBox>
+    </left>
+
+    <!-- ÁREA CENTRAL DE CONTENIDO -->
+    <center>
+        <BorderPane style="-fx-background-color: #f3f6fa;">
+
+            <!-- Barra de ruta y botón de regreso -->
+            <top>
+                <HBox alignment="CENTER_LEFT" spacing="12"
+                      style="-fx-background-color: white; -fx-padding: 11 24; -fx-border-color: #e3e9f0; -fx-border-width: 0 0 1 0;">
+                    <Label text="PANEL" style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: bold;"/>
+                    <Label text="/" style="-fx-text-fill: #94a3b8;"/>
+                    <Label fx:id="lblRuta" text="Inicio"
+                           style="-fx-text-fill: #0f172a; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button fx:id="btnVolver" text="← Regresar" onAction="#handleVolverAtras"
+                            visible="false" managed="false"
+                            style="-fx-background-color: #e2e8f0; -fx-text-fill: #0f172a; -fx-font-weight: bold;
+                                   -fx-background-radius: 7; -fx-padding: 7 16; -fx-cursor: hand;"/>
+                </HBox>
+            </top>
+
+            <!-- Contenedor dinámico de pantallas -->
+            <center>
+                <StackPane fx:id="panelContenido" style="-fx-background-color: #f3f6fa;">
+                    <children>
+
+                        <!-- PANTALLA DE INICIO (HOME) -->
+                        <ScrollPane fx:id="vistaInicio" fitToWidth="true"
+                                    style="-fx-background: #f3f6fa; -fx-background-color: transparent;">
+                            <content>
+                                <VBox alignment="TOP_LEFT" spacing="24"
+                                      style="-fx-padding: 28 34; -fx-background-color: #f3f6fa;">
+
+                                    <!-- Banner de Bienvenida -->
+                                    <VBox spacing="10"
+                                          style="-fx-background-color: #e0f2fe; -fx-padding: 26 28; -fx-background-radius: 12;
+                                                 -fx-border-color: #bae6fd; -fx-border-radius: 12;">
+                                        <HBox spacing="10" alignment="CENTER_LEFT">
+                                            <Label text="CENTRO DE OPERACIONES"
+                                                   style="-fx-text-fill: #0284c7; -fx-font-size: 11px; -fx-font-weight: bold;"/>
+                                            <Region HBox.hgrow="ALWAYS"/>
+                                            <Label text="ACCESO VENDEDOR"
+                                                   style="-fx-text-fill: #0369a1; -fx-font-size: 11px; -fx-font-weight: bold;"/>
+                                        </HBox>
+                                        <Label fx:id="lblBienvenida" text="¡Bienvenido!"
+                                               style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #0f172a;"/>
+                                        <Label text="Realizá ventas rápidas, consultá existencias del catálogo y revisá tus ventas del día desde un solo lugar."
+                                               wrapText="true"
+                                               style="-fx-font-size: 14px; -fx-text-fill: #334155;"/>
+                                        <Label fx:id="lblFechaActual" text="Fecha actual"
+                                               style="-fx-font-size: 12px; -fx-text-fill: #64748b;"/>
+                                    </VBox>
+
+                                    <!-- Subtítulo Accesos Rápidos -->
+                                    <HBox alignment="CENTER_LEFT" spacing="10">
+                                        <Label text="Accesos rápidos"
+                                               style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #0f172a;"/>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <Label text="Seleccioná la acción que deseás realizar"
+                                               style="-fx-font-size: 12px; -fx-text-fill: #64748b;"/>
+                                    </HBox>
+
+                                    <!-- Grid con 3 tarjetas de acceso rápido -->
+                                    <GridPane hgap="18" vgap="18">
+                                        <columnConstraints>
+                                            <ColumnConstraints percentWidth="33.33" hgrow="ALWAYS"/>
+                                            <ColumnConstraints percentWidth="33.33" hgrow="ALWAYS"/>
+                                            <ColumnConstraints percentWidth="33.33" hgrow="ALWAYS"/>
+                                        </columnConstraints>
+
+                                        <!-- Tarjeta 1: Punto de Venta -->
+                                        <VBox spacing="14" GridPane.columnIndex="0" GridPane.rowIndex="0"
+                                              style="-fx-background-color: white; -fx-padding: 22; -fx-background-radius: 12;
+                                                     -fx-border-color: #e2e8f0; -fx-border-radius: 12;
+                                                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 8, 0, 0, 2);">
+                                            <Label text="🛒 PUNTO DE VENTA"
+                                                   style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #0f172a;"/>
+                                            <Label text="Armá el carrito con filtros avanzados, aplicá descuentos y completá la factura con el nuevo formulario de cobro."
+                                                   wrapText="true" style="-fx-text-fill: #64748b; -fx-font-size: 13px;"/>
+                                            <Region VBox.vgrow="ALWAYS"/>
+                                            <Button text="Iniciar Venta" onAction="#handleNavVenta" maxWidth="Infinity"
+                                                    style="-fx-background-color: #16a34a; -fx-text-fill: white; -fx-font-weight: bold;
+                                                           -fx-padding: 10; -fx-cursor: hand; -fx-background-radius: 6; -fx-font-size: 13px;"/>
+                                        </VBox>
+
+                                        <!-- Tarjeta 2: Buscador de Calzado -->
+                                        <VBox spacing="14" GridPane.columnIndex="1" GridPane.rowIndex="0"
+                                              style="-fx-background-color: white; -fx-padding: 22; -fx-background-radius: 12;
+                                                     -fx-border-color: #e2e8f0; -fx-border-radius: 12;
+                                                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 8, 0, 0, 2);">
+                                            <Label text="🔍 BUSCADOR DE CALZADO"
+                                                   style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #0f172a;"/>
+                                            <Label text="Consultá rápidamente disponibilidad de modelos, marcas, tallas y colores para responder al cliente al instante."
+                                                   wrapText="true" style="-fx-text-fill: #64748b; -fx-font-size: 13px;"/>
+                                            <Region VBox.vgrow="ALWAYS"/>
+                                            <Button text="Buscar Productos" onAction="#handleNavBuscador" maxWidth="Infinity"
+                                                    style="-fx-background-color: #0284c7; -fx-text-fill: white; -fx-font-weight: bold;
+                                                           -fx-padding: 10; -fx-cursor: hand; -fx-background-radius: 6; -fx-font-size: 13px;"/>
+                                        </VBox>
+
+                                        <!-- Tarjeta 3: Mis Ventas del Día -->
+                                        <VBox spacing="14" GridPane.columnIndex="2" GridPane.rowIndex="0"
+                                              style="-fx-background-color: white; -fx-padding: 22; -fx-background-radius: 12;
+                                                     -fx-border-color: #e2e8f0; -fx-border-radius: 12;
+                                                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 8, 0, 0, 2);">
+                                            <Label text="📜 MIS VENTAS DEL DÍA"
+                                                   style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #0f172a;"/>
+                                            <Label text="Revisá tu rendimiento del día, total facturado en córdobas, cantidad de ventas y desglose de cada comprobante."
+                                                   wrapText="true" style="-fx-text-fill: #64748b; -fx-font-size: 13px;"/>
+                                            <Region VBox.vgrow="ALWAYS"/>
+                                            <Button text="Ver Mis Ventas" onAction="#handleNavMisVentas" maxWidth="Infinity"
+                                                    style="-fx-background-color: #7c3aed; -fx-text-fill: white; -fx-font-weight: bold;
+                                                           -fx-padding: 10; -fx-cursor: hand; -fx-background-radius: 6; -fx-font-size: 13px;"/>
+                                        </VBox>
+                                    </GridPane>
+                                </VBox>
+                            </content>
+                        </ScrollPane>
+                    </children>
+                </StackPane>
+            </center>
+        </BorderPane>
+    </center>
+</BorderPane>

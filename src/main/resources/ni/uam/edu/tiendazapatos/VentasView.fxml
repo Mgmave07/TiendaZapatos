@@ -1,62 +1,156 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox spacing="15.0" prefWidth="720.0" prefHeight="520.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ni.uam.edu.tiendazapatos.Controller.VentasViewController">
+<VBox spacing="12.0" prefWidth="1150.0" prefHeight="720.0" minWidth="900.0" minHeight="600.0"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="ni.uam.edu.tiendazapatos.Controller.VentasViewController"
+      style="-fx-background-color: #f8f9fa;">
     <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+        <Insets top="16.0" bottom="16.0" left="20.0" right="20.0"/>
     </padding>
 
-    <Label text="Formulario de Facturación" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+    <!-- Encabezado de Facturación -->
+    <VBox spacing="2">
+        <Label text="Facturación y Venta de Productos"
+               style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
+        <Label text="Búsqueda de productos del inventario y generación de facturas"
+               style="-fx-font-size: 13px; -fx-text-fill: #64748b;"/>
+    </VBox>
 
-    <!-- Fila 1: Selector de Producto del Inventario -->
-    <HBox spacing="10.0" alignment="CENTER_LEFT">
-        <Label text="Producto:"/>
-        <ComboBox fx:id="cmbProductos" promptText="Seleccione zapato y talla..." prefWidth="360.0" HBox.hgrow="ALWAYS"/>
-        <Label text="Cant:"/>
-        <TextField fx:id="txtCantidad" prefWidth="55.0" text="1"/>
-        <Button text="Agregar" onAction="#agregarAlCarrito" style="-fx-background-color: #007bff; -fx-text-fill: white; -fx-font-weight: bold;"/>
-    </HBox>
+    <SplitPane orientation="VERTICAL" dividerPositions="0.54" VBox.vgrow="ALWAYS"
+               style="-fx-background-color: transparent; -fx-box-border: transparent;">
+        <!-- SECCIÓN 1: Interfaz de búsqueda de productos del inventario -->
+        <VBox spacing="10.0" style="-fx-background-color: white; -fx-padding: 14; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+            <Label text="Búsqueda de Productos en Inventario"
+                   style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #334155;"/>
 
-    <!-- Fila 2: Tabla del Carrito -->
-    <TableView fx:id="tablaCarrito" prefHeight="240.0" VBox.vgrow="ALWAYS">
-        <columns>
-            <TableColumn fx:id="colProducto" text="Producto / Variante" prefWidth="310.0"/>
-            <TableColumn fx:id="colPrecio" text="Precio Unit." prefWidth="100.0"/>
-            <TableColumn fx:id="colCantidad" text="Cantidad" prefWidth="80.0"/>
-            <TableColumn fx:id="colSubtotal" text="Subtotal" prefWidth="110.0"/>
-        </columns>
-    </TableView>
+            <!-- Filtros de búsqueda avanzados por separado -->
+            <VBox spacing="8" style="-fx-background-color: #f8fafc; -fx-padding: 10 14; -fx-background-radius: 6; -fx-border-color: #e2e8f0; -fx-border-radius: 6;">
+                <!-- Fila 1: Modelo, Marca, Talla, Género -->
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="Modelo:" style="-fx-font-weight: bold; -fx-text-fill: #334155;"/>
+                    <TextField fx:id="txtModelo" promptText="Buscar por nombre de modelo..." HBox.hgrow="ALWAYS"/>
 
-    <!-- Fila 3: Método de pago y Totales -->
-    <HBox alignment="CENTER_LEFT" spacing="20.0">
-        <VBox spacing="6.0">
-            <Label text="Método de Pago:" style="-fx-font-weight: bold;"/>
-            <ComboBox fx:id="cmbMetodoPago" prefWidth="180.0"/>
-            <Button text="Quitar Seleccionado" onAction="#quitarDelCarrito" style="-fx-background-color: #dc3545; -fx-text-fill: white;"/>
+                    <Label text="Marca:" style="-fx-font-weight: bold; -fx-text-fill: #334155;"/>
+                    <ComboBox fx:id="cmbMarca" prefWidth="140"/>
+
+                    <Label text="Talla:" style="-fx-font-weight: bold; -fx-text-fill: #334155;"/>
+                    <TextField fx:id="txtTalla" promptText="Ej. 40, 9..." prefWidth="90"/>
+
+                    <Label text="Género:" style="-fx-font-weight: bold; -fx-text-fill: #334155;"/>
+                    <ComboBox fx:id="cmbGenero" prefWidth="110"/>
+                </HBox>
+
+                <!-- Fila 2: Stock, Rango de Precio (Mín/Máx), Limpiar y Actualizar -->
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="Stock:" style="-fx-font-weight: bold; -fx-text-fill: #334155;"/>
+                    <ComboBox fx:id="cmbStock" prefWidth="150"/>
+
+                    <Label text="Precio:" style="-fx-font-weight: bold; -fx-text-fill: #334155;"/>
+                    <TextField fx:id="txtPrecioMin" promptText="Mín (C$)" prefWidth="90"/>
+                    <Label text="—"/>
+                    <TextField fx:id="txtPrecioMax" promptText="Máx (C$)" prefWidth="90"/>
+
+                    <Region HBox.hgrow="ALWAYS"/>
+
+                    <Button text="Limpiar Filtros" onAction="#handleLimpiarFiltros"
+                            style="-fx-background-color: #64748b; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 5; -fx-padding: 5 12;"/>
+                    <Button text="Actualizar" onAction="#handleActualizar"
+                            style="-fx-background-color: #0284c7; -fx-text-fill: white; -fx-cursor: hand; -fx-font-weight: bold; -fx-background-radius: 5; -fx-padding: 5 14;"/>
+                </HBox>
+            </VBox>
+
+            <!-- Tabla de productos idéntica a gestión de inventario -->
+            <TableView fx:id="tablaProductos" VBox.vgrow="ALWAYS" prefHeight="190">
+                <columns>
+                    <TableColumn fx:id="colNombre" text="Modelo" prefWidth="150"/>
+                    <TableColumn fx:id="colMarca" text="Marca" prefWidth="100"/>
+                    <TableColumn fx:id="colGenero" text="Género" prefWidth="85"/>
+                    <TableColumn fx:id="colSistemaTalla" text="Sistema" prefWidth="75"/>
+                    <TableColumn fx:id="colTalla" text="Talla" prefWidth="70"/>
+                    <TableColumn fx:id="colColor" text="Color" prefWidth="95"/>
+                    <TableColumn fx:id="colStock" text="Stock" prefWidth="90"/>
+                    <TableColumn fx:id="colPrecio" text="Precio final" prefWidth="105"/>
+                    <TableColumn fx:id="colEstado" text="Estado" prefWidth="100"/>
+                </columns>
+            </TableView>
+
+            <!-- Fila de selección y agregado al carrito -->
+            <HBox spacing="12" alignment="CENTER_LEFT"
+                  style="-fx-background-color: #f1f5f9; -fx-padding: 8 12; -fx-background-radius: 6;">
+                <Label fx:id="lblProductoSeleccionado"
+                       text="Seleccione un producto de la tabla para agregarlo al carrito"
+                       style="-fx-font-size: 13px; -fx-text-fill: #475569; -fx-font-weight: 500;"
+                       HBox.hgrow="ALWAYS"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label text="Cantidad:" style="-fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
+                <TextField fx:id="txtCantidad" prefWidth="60.0" text="1" alignment="CENTER"
+                           style="-fx-font-weight: bold;"/>
+                <Button text="+ Agregar al Carrito" onAction="#agregarAlCarrito"
+                        style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 7 16; -fx-background-radius: 5; -fx-cursor: hand;"/>
+            </HBox>
         </VBox>
 
-        <Region HBox.hgrow="ALWAYS"/>
+        <!-- SECCIÓN 2: Carrito de Compras / Factura y Totales -->
+        <VBox spacing="10.0" style="-fx-background-color: white; -fx-padding: 14; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label text="Detalle de Factura (Carrito)"
+                       style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #334155;"/>
+                <Label fx:id="lblItemsCount" text="(0 artículos)"
+                       style="-fx-text-fill: #64748b; -fx-font-size: 13px;"/>
+            </HBox>
 
-        <VBox alignment="TOP_RIGHT" spacing="5.0">
-            <HBox alignment="TOP_RIGHT" spacing="10.0">
-                <Label text="Subtotal: $"/>
-                <Label fx:id="lblSubtotal" text="0.00" style="-fx-font-weight: bold;"/>
-            </HBox>
-            <HBox alignment="TOP_RIGHT" spacing="10.0">
-                <Label text="IVA (15%): $"/>
-                <Label fx:id="lblImpuesto" text="0.00" style="-fx-font-weight: bold;"/>
-            </HBox>
-            <HBox alignment="TOP_RIGHT" spacing="10.0">
-                <Label text="TOTAL: $"/>
-                <Label fx:id="lblTotal" text="0.00" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: red;"/>
+            <!-- Tabla del Carrito -->
+            <TableView fx:id="tablaCarrito" prefHeight="150" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="colProductoCarrito" text="Producto / Variante" prefWidth="420.0"/>
+                    <TableColumn fx:id="colPrecioCarrito" text="Precio Unit." prefWidth="120.0"/>
+                    <TableColumn fx:id="colCantidadCarrito" text="Cantidad" prefWidth="90.0"/>
+                    <TableColumn fx:id="colSubtotalCarrito" text="Subtotal" prefWidth="130.0"/>
+                </columns>
+            </TableView>
+
+            <!-- Fila de pago, botones de gestión y totales -->
+            <HBox alignment="CENTER_LEFT" spacing="20.0">
+                <VBox spacing="8.0" prefWidth="280">
+                    <HBox spacing="8" alignment="CENTER_LEFT">
+                        <Label text="Método de Pago:" style="-fx-font-weight: bold; -fx-text-fill: #334155;"/>
+                        <ComboBox fx:id="cmbMetodoPago" prefWidth="140.0"/>
+                    </HBox>
+                    <HBox spacing="10">
+                        <Button text="Quitar Seleccionado" onAction="#quitarDelCarrito"
+                                style="-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-background-radius: 5;"/>
+                        <Button text="Vaciar Carrito" onAction="#limpiarCarrito"
+                                style="-fx-background-color: #94a3b8; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-background-radius: 5;"/>
+                    </HBox>
+                </VBox>
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <VBox alignment="CENTER_RIGHT" spacing="4.0"
+                      style="-fx-background-color: #f8fafc; -fx-padding: 8 16; -fx-background-radius: 6; -fx-border-color: #e2e8f0; -fx-border-radius: 6;">
+                    <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                        <Label text="Subtotal:" style="-fx-text-fill: #64748b;"/>
+                        <Label fx:id="lblSubtotal" text="C$ 0.00" style="-fx-font-weight: bold; -fx-min-width: 90; -fx-alignment: CENTER_RIGHT;"/>
+                    </HBox>
+                    <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                        <Label text="IVA (15%):" style="-fx-text-fill: #64748b;"/>
+                        <Label fx:id="lblImpuesto" text="C$ 0.00" style="-fx-font-weight: bold; -fx-min-width: 90; -fx-alignment: CENTER_RIGHT;"/>
+                    </HBox>
+                    <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                        <Label text="TOTAL:" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #0f172a;"/>
+                        <Label fx:id="lblTotal" text="C$ 0.00"
+                               style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #16a34a; -fx-min-width: 90; -fx-alignment: CENTER_RIGHT;"/>
+                    </HBox>
+                </VBox>
+
+                <Button text="Realizar Venta (Facturar)" onAction="#facturarVenta"
+                        style="-fx-background-color: #16a34a; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px; -fx-padding: 12 24; -fx-background-radius: 6; -fx-cursor: hand;"
+                        prefHeight="48.0"/>
             </HBox>
         </VBox>
-    </HBox>
-
-    <!-- Fila 4: Botón Facturar -->
-    <HBox alignment="CENTER_RIGHT">
-        <Button text="Realizar Venta (Facturar)" style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;" onAction="#facturarVenta" prefHeight="40.0" prefWidth="220.0"/>
-    </HBox>
+    </SplitPane>
 </VBox>

@@ -11,19 +11,24 @@ import java.util.UUID;
 public class InventarioDAO {
 
     public record Variante(
+            UUID inventarioId,
             UUID zapatoId,
             String genero,
             String sistemaTalla,
             String talla,
             String color,
             int cantidadStock
-    ) {}
+    ) {
+        public Variante(UUID zapatoId, String genero, String sistemaTalla, String talla, String color, int cantidadStock) {
+            this(null, zapatoId, genero, sistemaTalla, talla, color, cantidadStock);
+        }
+    }
 
     public List<Variante> obtenerVariantes() {
         EntityManager em = HibernateUtil.getEntityManager();
         try {
             List<?> resultados = em.createNativeQuery("""
-                    SELECT zapato_id, genero, sistema_talla, talla, color, cantidad_stock
+                    SELECT inventario_id, zapato_id, genero, sistema_talla, talla, color, cantidad_stock
                     FROM public.inventario
                     ORDER BY genero, sistema_talla, talla, color
                     """).getResultList();
@@ -31,14 +36,15 @@ public class InventarioDAO {
             List<Variante> variantes = new ArrayList<>();
             for (Object resultado : resultados) {
                 Object[] fila = (Object[]) resultado;
-                UUID id = (UUID) fila[0];
-                String genero = (String) fila[1];
-                String sistema = (String) fila[2];
-                String talla = (String) fila[3];
-                String color = (String) fila[4];
-                int stock = ((Number) fila[5]).intValue();
+                UUID inventarioId = (UUID) fila[0];
+                UUID id = (UUID) fila[1];
+                String genero = (String) fila[2];
+                String sistema = (String) fila[3];
+                String talla = (String) fila[4];
+                String color = (String) fila[5];
+                int stock = ((Number) fila[6]).intValue();
 
-                variantes.add(new Variante(id, genero, sistema, talla, color, stock));
+                variantes.add(new Variante(inventarioId, id, genero, sistema, talla, color, stock));
             }
             return variantes;
         } finally {
