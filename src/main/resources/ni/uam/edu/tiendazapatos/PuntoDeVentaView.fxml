@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="ni.uam.edu.tiendazapatos.Controller.PuntoDeVentaController"
+      spacing="0" style="-fx-background-color: #f8fafc;">
+
+    <!-- TÍTULO SECCIÓN -->
+    <HBox style="-fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-width: 0 0 1 0; -fx-padding: 12 20 12 20;">
+        <Label text="🛒 Punto de Venta" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #0f172a;"/>
+    </HBox>
+
+    <SplitPane orientation="VERTICAL" VBox.vgrow="ALWAYS" dividerPositions="0.55"
+               style="-fx-background-color: #f8fafc;">
+
+        <!-- ═══════════════ PANEL SUPERIOR: CATÁLOGO ═══════════════ -->
+        <VBox spacing="10" style="-fx-background-color: #f8fafc;">
+            <padding><Insets top="12" right="16" bottom="8" left="16"/></padding>
+
+            <!-- FILTROS FILA 1 -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <VBox spacing="3">
+                    <Label text="Modelo" style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
+                    <TextField fx:id="txtModelo" promptText="Buscar modelo..." prefWidth="160"
+                               style="-fx-font-size: 12px;"/>
+                </VBox>
+                <VBox spacing="3">
+                    <Label text="Marca" style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
+                    <ComboBox fx:id="cmbMarca" prefWidth="140" style="-fx-font-size: 12px;"/>
+                </VBox>
+                <VBox spacing="3">
+                    <Label text="Talla" style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
+                    <TextField fx:id="txtTalla" promptText="Ej: 38" prefWidth="80"
+                               style="-fx-font-size: 12px;"/>
+                </VBox>
+                <VBox spacing="3">
+                    <Label text="Stock" style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
+                    <ComboBox fx:id="cmbStock" prefWidth="130" style="-fx-font-size: 12px;"/>
+                </VBox>
+            </HBox>
+
+            <!-- FILTROS FILA 2 -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <VBox spacing="3">
+                    <Label text="Género" style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
+                    <ComboBox fx:id="cmbGenero" prefWidth="130" style="-fx-font-size: 12px;"/>
+                </VBox>
+                <VBox spacing="3">
+                    <Label text="Precio mín." style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
+                    <TextField fx:id="txtPrecioMin" promptText="C$ mín." prefWidth="90"
+                               style="-fx-font-size: 12px;"/>
+                </VBox>
+                <VBox spacing="3">
+                    <Label text="Precio máx." style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
+                    <TextField fx:id="txtPrecioMax" promptText="C$ máx." prefWidth="90"
+                               style="-fx-font-size: 12px;"/>
+                </VBox>
+                <VBox spacing="3">
+                    <Label text=" " style="-fx-font-size: 11px;"/>
+                    <HBox spacing="8">
+                        <Button text="Limpiar" onAction="#handleLimpiarFiltros"
+                                style="-fx-background-color: #e2e8f0; -fx-background-radius: 6; -fx-font-size: 12px;"/>
+                        <Button text="🔍 Actualizar" onAction="#handleActualizar"
+                                style="-fx-background-color: #0284c7; -fx-text-fill: white; -fx-background-radius: 6; -fx-font-size: 12px;"/>
+                    </HBox>
+                </VBox>
+            </HBox>
+
+            <!-- TABLA PRODUCTOS -->
+            <TableView fx:id="tablaProductos" VBox.vgrow="ALWAYS" style="-fx-font-size: 12px;">
+                <columns>
+                    <TableColumn fx:id="colNombre"       text="Modelo"       prefWidth="160"/>
+                    <TableColumn fx:id="colMarca"        text="Marca"        prefWidth="100"/>
+                    <TableColumn fx:id="colGenero"       text="Género"       prefWidth="80"/>
+                    <TableColumn fx:id="colSistemaTalla" text="Sistema"      prefWidth="70"/>
+                    <TableColumn fx:id="colTalla"        text="Talla"        prefWidth="60"/>
+                    <TableColumn fx:id="colColor"        text="Color"        prefWidth="90"/>
+                    <TableColumn fx:id="colStock"        text="Stock"        prefWidth="60"/>
+                    <TableColumn fx:id="colPrecio"       text="Precio"       prefWidth="90"/>
+                    <TableColumn fx:id="colEstado"       text="Estado"       prefWidth="80"/>
+                </columns>
+                <placeholder><Label text="No hay productos que coincidan con los filtros."/></placeholder>
+            </TableView>
+
+            <!-- BARRA SELECCIÓN -->
+            <HBox spacing="12" alignment="CENTER_LEFT"
+                  style="-fx-background-color: #e0f2fe; -fx-background-radius: 6; -fx-padding: 8 12 8 12;">
+                <Label fx:id="lblProductoSeleccionado" text="Selecciona un producto de la tabla"
+                       style="-fx-text-fill: #0369a1; -fx-font-size: 12px;" HBox.hgrow="ALWAYS"/>
+                <Label text="Cant.:" style="-fx-font-size: 12px; -fx-font-weight: bold;"/>
+                <TextField fx:id="txtCantidad" text="1" prefWidth="55" style="-fx-font-size: 12px;" alignment="CENTER"/>
+                <Button text="➕ Agregar al Carrito" onAction="#handleAgregarCarrito"
+                        style="-fx-background-color: #0284c7; -fx-text-fill: white; -fx-font-weight: bold;
+                               -fx-background-radius: 6; -fx-font-size: 12px;"/>
+            </HBox>
+        </VBox>
+
+        <!-- ═══════════════ PANEL INFERIOR: CARRITO ═══════════════ -->
+        <VBox spacing="10" style="-fx-background-color: white;">
+            <padding><Insets top="12" right="16" bottom="12" left="16"/></padding>
+
+            <HBox alignment="CENTER_LEFT" spacing="12">
+                <Label text="🛒 Carrito" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #0f172a;" HBox.hgrow="ALWAYS"/>
+                <Label fx:id="lblItemsCount" text="0 ítems"
+                       style="-fx-background-color: #e2e8f0; -fx-background-radius: 10; -fx-padding: 2 10 2 10; -fx-font-size: 12px;"/>
+                <Button text="🗑 Vaciar" onAction="#handleLimpiarCarrito"
+                        style="-fx-background-color: #fee2e2; -fx-text-fill: #dc2626; -fx-background-radius: 6; -fx-font-size: 12px;"/>
+            </HBox>
+
+            <TableView fx:id="tablaCarrito" VBox.vgrow="ALWAYS" style="-fx-font-size: 12px;">
+                <columns>
+                    <TableColumn fx:id="colProductoCarrito" text="Producto"       prefWidth="300"/>
+                    <TableColumn fx:id="colCantidadCarrito" text="Cant."          prefWidth="60"/>
+                    <TableColumn fx:id="colPrecioCarrito"   text="P. Unit."       prefWidth="90"/>
+                    <TableColumn fx:id="colSubtotalCarrito" text="Subtotal"       prefWidth="100"/>
+                </columns>
+                <placeholder><Label text="El carrito está vacío."/></placeholder>
+            </TableView>
+
+            <!-- TOTALES + COBRAR -->
+            <HBox alignment="CENTER_RIGHT" spacing="20"
+                  style="-fx-background-color: #0f172a; -fx-background-radius: 8; -fx-padding: 12 20 12 20;">
+                <VBox alignment="CENTER">
+                    <Label text="SUBTOTAL" style="-fx-text-fill: #94a3b8; -fx-font-size: 10px;"/>
+                    <Label fx:id="lblSubtotal" text="C$ 0.00"
+                           style="-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                </VBox>
+                <VBox alignment="CENTER">
+                    <Label text="IVA (15%)" style="-fx-text-fill: #94a3b8; -fx-font-size: 10px;"/>
+                    <Label fx:id="lblImpuesto" text="C$ 0.00"
+                           style="-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                </VBox>
+                <VBox alignment="CENTER">
+                    <Label text="TOTAL" style="-fx-text-fill: #94a3b8; -fx-font-size: 10px;"/>
+                    <Label fx:id="lblTotal" text="C$ 0.00"
+                           style="-fx-text-fill: #38bdf8; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="💳 Proceder al Cobro" onAction="#handleProcederCobro"
+                        style="-fx-background-color: #16a34a; -fx-text-fill: white; -fx-font-weight: bold;
+                               -fx-font-size: 14px; -fx-background-radius: 8; -fx-padding: 10 24 10 24;"/>
+            </HBox>
+        </VBox>
+    </SplitPane>
+</VBox>

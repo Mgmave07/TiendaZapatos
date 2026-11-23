@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="14.0" prefWidth="1100.0" prefHeight="700.0"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="ni.uam.edu.tiendazapatos.Controller.HistorialVentasController"
+      style="-fx-background-color: #f8fafc;">
+    <padding>
+        <Insets top="18.0" bottom="18.0" left="22.0" right="22.0"/>
+    </padding>
+
+    <!-- Encabezado con KPIs -->
+    <HBox alignment="CENTER_LEFT" spacing="15">
+        <VBox spacing="2">
+            <Label text="Historial de Ventas y Facturación"
+                   style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
+            <Label text="Consulta de ventas realizadas, desglose de productos y auditoría de transacciones"
+                   style="-fx-font-size: 13px; -fx-text-fill: #64748b;"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+
+        <!-- Mini tarjetas de resumen -->
+        <HBox spacing="12">
+            <VBox alignment="CENTER_RIGHT" style="-fx-background-color: white; -fx-padding: 8 16; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+                <Label text="TOTAL FACTURADO" style="-fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: #64748b;"/>
+                <Label fx:id="lblKpiTotalFacturado" text="C$ 0.00" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #16a34a;"/>
+            </VBox>
+            <VBox alignment="CENTER_RIGHT" style="-fx-background-color: white; -fx-padding: 8 16; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+                <Label text="VENTAS TOTALES" style="-fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: #64748b;"/>
+                <Label fx:id="lblKpiCantidadVentas" text="0 transacciones" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #0284c7;"/>
+            </VBox>
+        </HBox>
+    </HBox>
+
+    <!-- Barra de Filtros Separados de Búsqueda -->
+    <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 12 16; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+        <!-- Fila 1: N° Factura, Método de Pago, Estado -->
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <Label text="N° Factura:" style="-fx-font-weight: bold; -fx-text-fill: #334155;"/>
+            <TextField fx:id="txtBuscarFactura" promptText="Ej. FAC-A1B2C3D4..." HBox.hgrow="ALWAYS" style="-fx-padding: 7 10;"/>
+
+            <Label text="Método Pago:" style="-fx-font-weight: bold; -fx-text-fill: #334155;"/>
+            <ComboBox fx:id="cmbMetodoPago" prefWidth="150"/>
+
+            <Label text="Estado:" style="-fx-font-weight: bold; -fx-text-fill: #334155;"/>
+            <ComboBox fx:id="cmbEstadoVenta" prefWidth="140"/>
+        </HBox>
+
+        <!-- Fila 2: Rango de Fechas (Desde / Hasta), Limpiar y Actualizar -->
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <Label text="Desde:" style="-fx-font-weight: bold; -fx-text-fill: #334155;"/>
+            <DatePicker fx:id="dpFechaDesde" prefWidth="150" promptText="Fecha inicial"/>
+
+            <Label text="Hasta:" style="-fx-font-weight: bold; -fx-text-fill: #334155;"/>
+            <DatePicker fx:id="dpFechaHasta" prefWidth="150" promptText="Fecha final"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <Button text="Limpiar Filtros" onAction="#handleLimpiarFiltros"
+                    style="-fx-background-color: #64748b; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 5; -fx-padding: 6 14;"/>
+            <Button text="Actualizar" onAction="#handleActualizar"
+                    style="-fx-background-color: #0284c7; -fx-text-fill: white; -fx-cursor: hand; -fx-font-weight: bold; -fx-background-radius: 5; -fx-padding: 6 16;"/>
+        </HBox>
+    </VBox>
+
+    <!-- SplitPane con Tabla de Ventas y Tabla de Desglose de Productos -->
+    <SplitPane orientation="VERTICAL" dividerPositions="0.55" VBox.vgrow="ALWAYS"
+               style="-fx-background-color: transparent; -fx-box-border: transparent;">
+        <!-- Panel Superior: Lista de Facturas / Ventas -->
+        <VBox spacing="8" style="-fx-background-color: white; -fx-padding: 12; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+            <Label text="Ventas Realizadas" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #334155;"/>
+            <TableView fx:id="tablaVentas" VBox.vgrow="ALWAYS" prefHeight="220">
+                <columns>
+                    <TableColumn fx:id="colNumeroVenta" text="N° Factura" prefWidth="160"/>
+                    <TableColumn fx:id="colFecha" text="Fecha y Hora" prefWidth="170"/>
+                    <TableColumn fx:id="colMetodoPago" text="Método Pago" prefWidth="130"/>
+                    <TableColumn fx:id="colSubtotal" text="Subtotal" prefWidth="120"/>
+                    <TableColumn fx:id="colImpuesto" text="IVA (15%)" prefWidth="110"/>
+                    <TableColumn fx:id="colTotal" text="Total" prefWidth="130"/>
+                    <TableColumn fx:id="colEstado" text="Estado" prefWidth="100"/>
+                    <TableColumn fx:id="colCantArticulos" text="Artículos" prefWidth="90"/>
+                </columns>
+            </TableView>
+        </VBox>
+
+        <!-- Panel Inferior: Desglose de Productos de la Venta Seleccionada -->
+        <VBox spacing="8" style="-fx-background-color: white; -fx-padding: 12; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label text="Desglose de Productos Vendidos" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #334155;"/>
+                <Label fx:id="lblDetalleFactura" text="(Seleccione una factura de arriba para ver sus productos)"
+                       style="-fx-font-size: 13px; -fx-text-fill: #64748b; -fx-font-style: italic;"/>
+            </HBox>
+
+            <TableView fx:id="tablaDetalles" VBox.vgrow="ALWAYS" prefHeight="160">
+                <columns>
+                    <TableColumn fx:id="colDetalleProducto" text="Producto / Modelo / Variante" prefWidth="480"/>
+                    <TableColumn fx:id="colDetalleCantidad" text="Cantidad" prefWidth="110"/>
+                    <TableColumn fx:id="colDetallePrecioUnit" text="Precio Unitario" prefWidth="140"/>
+                    <TableColumn fx:id="colDetalleSubtotal" text="Subtotal" prefWidth="150"/>
+                </columns>
+            </TableView>
+        </VBox>
+    </SplitPane>
+</VBox>

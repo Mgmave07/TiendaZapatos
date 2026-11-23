@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="ni.uam.edu.tiendazapatos.Controller.MisVentasController"
+      spacing="0" style="-fx-background-color: #f8fafc;">
+
+    <!-- TÍTULO -->
+    <HBox style="-fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-width: 0 0 1 0; -fx-padding: 12 20 12 20;">
+        <Label text="📜 Mis Ventas" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #0f172a;"/>
+    </HBox>
+
+    <VBox spacing="12" VBox.vgrow="ALWAYS">
+        <padding><Insets top="12" right="16" bottom="12" left="16"/></padding>
+
+        <!-- KPIs -->
+        <HBox spacing="16">
+            <!-- Total del día -->
+            <VBox style="-fx-background-color: white; -fx-background-radius: 8;
+                         -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.08),6,0,0,2);
+                         -fx-padding: 14 20 14 20;" HBox.hgrow="ALWAYS" alignment="CENTER">
+                <Label text="TOTAL VENDIDO" style="-fx-font-size: 10px; -fx-text-fill: #64748b;"/>
+                <Label fx:id="lblTotalDia" text="C$ 0.00"
+                       style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #16a34a;"/>
+            </VBox>
+            <!-- Número de ventas -->
+            <VBox style="-fx-background-color: white; -fx-background-radius: 8;
+                         -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.08),6,0,0,2);
+                         -fx-padding: 14 20 14 20;" HBox.hgrow="ALWAYS" alignment="CENTER">
+                <Label text="VENTAS REALIZADAS" style="-fx-font-size: 10px; -fx-text-fill: #64748b;"/>
+                <Label fx:id="lblVentasDia" text="0"
+                       style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #0284c7;"/>
+            </VBox>
+            <!-- Ticket promedio -->
+            <VBox style="-fx-background-color: white; -fx-background-radius: 8;
+                         -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.08),6,0,0,2);
+                         -fx-padding: 14 20 14 20;" HBox.hgrow="ALWAYS" alignment="CENTER">
+                <Label text="TICKET PROMEDIO" style="-fx-font-size: 10px; -fx-text-fill: #64748b;"/>
+                <Label fx:id="lblTicketPromedio" text="C$ 0.00"
+                       style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #7c3aed;"/>
+            </VBox>
+        </HBox>
+
+        <!-- FILTROS FECHA -->
+        <HBox spacing="12" alignment="CENTER_LEFT"
+              style="-fx-background-color: white; -fx-background-radius: 8;
+                     -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.06),4,0,0,1);
+                     -fx-padding: 10 16 10 16;">
+            <Label text="Desde:" style="-fx-font-size: 12px; -fx-font-weight: bold;"/>
+            <DatePicker fx:id="dpDesde" prefWidth="145" style="-fx-font-size: 12px;"/>
+            <Label text="Hasta:" style="-fx-font-size: 12px; -fx-font-weight: bold;"/>
+            <DatePicker fx:id="dpHasta" prefWidth="145" style="-fx-font-size: 12px;"/>
+            <Button text="🔍 Actualizar" onAction="#handleActualizar"
+                    style="-fx-background-color: #0284c7; -fx-text-fill: white;
+                           -fx-background-radius: 6; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+            <Button text="Hoy" onAction="#handleHoy"
+                    style="-fx-background-color: #e2e8f0; -fx-background-radius: 6; -fx-font-size: 12px;"/>
+        </HBox>
+
+        <!-- SPLIT: TABLA VENTAS | DETALLE PRODUCTOS -->
+        <SplitPane orientation="VERTICAL" VBox.vgrow="ALWAYS" dividerPositions="0.55">
+
+            <!-- TABLA DE MIS VENTAS -->
+            <TableView fx:id="tablaVentas" style="-fx-font-size: 12px;">
+                <columns>
+                    <TableColumn fx:id="colNumero"   text="N° Venta"      prefWidth="130"/>
+                    <TableColumn fx:id="colFecha"    text="Fecha / Hora"  prefWidth="150"/>
+                    <TableColumn fx:id="colCliente"  text="Cliente"       prefWidth="160"/>
+                    <TableColumn fx:id="colMetodo"   text="Método"        prefWidth="100"/>
+                    <TableColumn fx:id="colTotal"    text="Total"         prefWidth="100"/>
+                    <TableColumn fx:id="colEstado"   text="Estado"        prefWidth="90"/>
+                </columns>
+                <placeholder><Label text="No hay ventas en el período seleccionado."/></placeholder>
+            </TableView>
+
+            <!-- DETALLE PRODUCTOS -->
+            <VBox spacing="8" style="-fx-background-color: white;">
+                <padding><Insets top="10" right="12" bottom="10" left="12"/></padding>
+                <Label text="Detalle de productos" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #334155;"/>
+                <TableView fx:id="tablaDetalles" VBox.vgrow="ALWAYS" style="-fx-font-size: 12px;">
+                    <columns>
+                        <TableColumn fx:id="colDetProducto"  text="Producto"      prefWidth="300"/>
+                        <TableColumn fx:id="colDetCantidad"  text="Cant."         prefWidth="70"/>
+                        <TableColumn fx:id="colDetPrecio"    text="P. Unit."      prefWidth="100"/>
+                        <TableColumn fx:id="colDetSubtotal"  text="Subtotal"      prefWidth="110"/>
+                    </columns>
+                    <placeholder><Label text="Selecciona una venta para ver el detalle."/></placeholder>
+                </TableView>
+            </VBox>
+        </SplitPane>
+    </VBox>
+</VBox>

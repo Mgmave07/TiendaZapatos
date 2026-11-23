@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="ni.uam.edu.tiendazapatos.Controller.BuscadorCalzadoController"
+      spacing="0" style="-fx-background-color: #f8fafc;">
+
+    <!-- TÍTULO -->
+    <HBox style="-fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-width: 0 0 1 0; -fx-padding: 12 20 12 20;">
+        <Label text="🔍 Buscador de Calzado" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #0f172a;"/>
+    </HBox>
+
+    <VBox spacing="10" VBox.vgrow="ALWAYS">
+        <padding><Insets top="12" right="16" bottom="12" left="16"/></padding>
+
+        <!-- FILTROS FILA 1 -->
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <VBox spacing="3">
+                <Label text="Modelo" style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
+                <TextField fx:id="txtModelo" promptText="Buscar modelo..." prefWidth="160"
+                           style="-fx-font-size: 12px;"/>
+            </VBox>
+            <VBox spacing="3">
+                <Label text="Marca" style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
+                <ComboBox fx:id="cmbMarca" prefWidth="140" style="-fx-font-size: 12px;"/>
+            </VBox>
+            <VBox spacing="3">
+                <Label text="Talla" style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
+                <TextField fx:id="txtTalla" promptText="Ej: 38" prefWidth="80"
+                           style="-fx-font-size: 12px;"/>
+            </VBox>
+            <VBox spacing="3">
+                <Label text="Stock" style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
+                <ComboBox fx:id="cmbStock" prefWidth="130" style="-fx-font-size: 12px;"/>
+            </VBox>
+        </HBox>
+
+        <!-- FILTROS FILA 2 -->
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <VBox spacing="3">
+                <Label text="Género" style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
+                <ComboBox fx:id="cmbGenero" prefWidth="130" style="-fx-font-size: 12px;"/>
+            </VBox>
+            <VBox spacing="3">
+                <Label text="Precio mín." style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
+                <TextField fx:id="txtPrecioMin" promptText="C$ mín." prefWidth="90"
+                           style="-fx-font-size: 12px;"/>
+            </VBox>
+            <VBox spacing="3">
+                <Label text="Precio máx." style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
+                <TextField fx:id="txtPrecioMax" promptText="C$ máx." prefWidth="90"
+                           style="-fx-font-size: 12px;"/>
+            </VBox>
+            <VBox spacing="3">
+                <Label text=" " style="-fx-font-size: 11px;"/>
+                <HBox spacing="8">
+                    <Button text="Limpiar" onAction="#handleLimpiarFiltros"
+                            style="-fx-background-color: #e2e8f0; -fx-background-radius: 6; -fx-font-size: 12px;"/>
+                    <Button text="🔍 Actualizar" onAction="#handleActualizar"
+                            style="-fx-background-color: #0284c7; -fx-text-fill: white; -fx-background-radius: 6; -fx-font-size: 12px;"/>
+                </HBox>
+            </VBox>
+        </HBox>
+
+        <!-- INFO RESULTADO -->
+        <HBox alignment="CENTER_LEFT" spacing="10">
+            <Label fx:id="lblResultados" text="Cargando catálogo..."
+                   style="-fx-text-fill: #64748b; -fx-font-size: 12px;"/>
+        </HBox>
+
+        <!-- TABLA (solo lectura) -->
+        <TableView fx:id="tablaProductos" VBox.vgrow="ALWAYS" style="-fx-font-size: 12px;">
+            <columns>
+                <TableColumn fx:id="colNombre"       text="Modelo"       prefWidth="170"/>
+                <TableColumn fx:id="colMarca"        text="Marca"        prefWidth="110"/>
+                <TableColumn fx:id="colGenero"       text="Género"       prefWidth="90"/>
+                <TableColumn fx:id="colSistemaTalla" text="Sistema"      prefWidth="80"/>
+                <TableColumn fx:id="colTalla"        text="Talla"        prefWidth="70"/>
+                <TableColumn fx:id="colColor"        text="Color"        prefWidth="100"/>
+                <TableColumn fx:id="colStock"        text="Stock"        prefWidth="70"/>
+                <TableColumn fx:id="colPrecio"       text="Precio"       prefWidth="100"/>
+                <TableColumn fx:id="colEstado"       text="Estado"       prefWidth="90"/>
+            </columns>
+            <placeholder><Label text="No hay productos que coincidan con los filtros."/></placeholder>
+        </TableView>
+    </VBox>
+</VBox>

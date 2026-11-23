@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="14.0" prefWidth="1100.0" prefHeight="680.0"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="ni.uam.edu.tiendazapatos.Controller.GestionUsuariosController"
+      style="-fx-background-color: #f8fafc;">
+    <padding>
+        <Insets top="18.0" bottom="18.0" left="22.0" right="22.0"/>
+    </padding>
+
+    <!-- Encabezado -->
+    <HBox alignment="CENTER_LEFT" spacing="15">
+        <VBox spacing="2">
+            <Label text="Gestión de Usuarios del Sistema"
+                   style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
+            <Label text="Administración de cuentas, roles, permisos y estado de acceso al sistema"
+                   style="-fx-font-size: 13px; -fx-text-fill: #64748b;"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="+ Registrar Nuevo Usuario" onAction="#handleNuevoUsuario"
+                style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 9 18; -fx-background-radius: 6; -fx-cursor: hand;"/>
+    </HBox>
+
+    <!-- Barra de Filtros y Búsqueda -->
+    <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 12 16; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <Label text="Buscar:" style="-fx-font-weight: bold; -fx-text-fill: #334155;"/>
+            <TextField fx:id="txtBuscar" promptText="Buscar por nombre, usuario, correo o teléfono..." HBox.hgrow="ALWAYS"
+                       style="-fx-padding: 7 10;"/>
+
+            <Label text="Rol:" style="-fx-font-weight: bold; -fx-text-fill: #334155;"/>
+            <ComboBox fx:id="cmbFiltroRol" prefWidth="160"/>
+
+            <Label text="Estado:" style="-fx-font-weight: bold; -fx-text-fill: #334155;"/>
+            <ComboBox fx:id="cmbFiltroEstado" prefWidth="150"/>
+
+            <Button text="Limpiar" onAction="#handleLimpiarFiltros"
+                    style="-fx-background-color: #64748b; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 5; -fx-padding: 6 14;"/>
+            <Button text="Actualizar" onAction="#handleActualizar"
+                    style="-fx-background-color: #0284c7; -fx-text-fill: white; -fx-cursor: hand; -fx-font-weight: bold; -fx-background-radius: 5; -fx-padding: 6 16;"/>
+        </HBox>
+    </VBox>
+
+    <!-- Tabla de Usuarios -->
+    <TableView fx:id="tablaUsuarios" VBox.vgrow="ALWAYS" prefHeight="400">
+        <columns>
+            <TableColumn fx:id="colUsuario" text="Usuario" prefWidth="130"/>
+            <TableColumn fx:id="colNombreCompleto" text="Nombre Completo" prefWidth="200"/>
+            <TableColumn fx:id="colCorreo" text="Correo Electrónico" prefWidth="200"/>
+            <TableColumn fx:id="colTelefono" text="Teléfono" prefWidth="120"/>
+            <TableColumn fx:id="colRol" text="Rol" prefWidth="140"/>
+            <TableColumn fx:id="colEstado" text="Estado" prefWidth="110"/>
+            <TableColumn fx:id="colCreado" text="Fecha Registro" prefWidth="140"/>
+        </columns>
+    </TableView>
+
+    <!-- Barra de Operaciones con el Usuario Seleccionado -->
+    <HBox spacing="12" alignment="CENTER_LEFT"
+          style="-fx-background-color: white; -fx-padding: 12 16; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+        <Label fx:id="lblSeleccion" text="Seleccione un usuario de la tabla para realizar operaciones"
+               style="-fx-font-size: 13px; -fx-text-fill: #475569; -fx-font-weight: 500;" HBox.hgrow="ALWAYS"/>
+        <Region HBox.hgrow="ALWAYS"/>
+
+        <Button fx:id="btnModificar" text="✏️ Modificar Información" onAction="#handleModificarUsuario"
+                style="-fx-background-color: #0284c7; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 6; -fx-cursor: hand;"/>
+
+        <Button fx:id="btnCambiarRol" text="🔄 Cambiar Rol" onAction="#handleCambiarRol"
+                style="-fx-background-color: #7c3aed; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 6; -fx-cursor: hand;"/>
+
+        <Button fx:id="btnToggleEstado" text="🔒 Desactivar / Activar" onAction="#handleToggleEstado"
+                style="-fx-background-color: #eab308; -fx-text-fill: #713f12; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 6; -fx-cursor: hand;"/>
+
+        <Button fx:id="btnEliminar" text="🗑️ Eliminar Usuario" onAction="#handleEliminarUsuario"
+                style="-fx-background-color: #dc2626; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 6; -fx-cursor: hand;"/>
+    </HBox>
+</VBox>
