@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane fitToWidth="true"
+            xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="ni.uam.edu.tiendazapatos.Controller.ReportesController"
+            style="-fx-background: #f8fafc; -fx-background-color: #f8fafc;">
+    <content>
+        <VBox spacing="18.0" style="-fx-background-color: #f8fafc;">
+            <padding>
+                <Insets top="22.0" bottom="24.0" left="26.0" right="26.0"/>
+            </padding>
+
+            <!-- Encabezado -->
+            <HBox alignment="CENTER_LEFT" spacing="14">
+                <VBox spacing="3">
+                    <Label text="Centro de Reportes PDF"
+                           style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
+                    <Label text="Generá reportes con JasperReports y exportalos a PDF seleccionando la ruta de destino"
+                           style="-fx-font-size: 13px; -fx-text-fill: #64748b;"/>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="btnActualizarResumen" text="Actualizar conteos" onAction="#handleActualizarResumen"
+                        style="-fx-background-color: #0284c7; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 16; -fx-background-radius: 6; -fx-cursor: hand;"/>
+            </HBox>
+
+            <!-- Barra de preferencia y estado -->
+            <HBox alignment="CENTER_LEFT" spacing="16"
+                  style="-fx-background-color: white; -fx-padding: 12 16; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+                <CheckBox fx:id="chkAbrirAlGenerar" text="Abrir automáticamente el PDF al finalizar" selected="true"
+                          style="-fx-font-size: 13px; -fx-text-fill: #334155;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="lblEstadoReporte" text="Listo para generar reportes."
+                       style="-fx-font-size: 12px; -fx-text-fill: #475569; -fx-font-weight: bold;"/>
+            </HBox>
+
+            <!-- Tarjetas de reportes -->
+            <GridPane hgap="18" vgap="18">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="50" hgrow="ALWAYS"/>
+                    <ColumnConstraints percentWidth="50" hgrow="ALWAYS"/>
+                </columnConstraints>
+
+                <!-- Reporte 1: Inventario -->
+                <VBox spacing="12" GridPane.columnIndex="0" GridPane.rowIndex="0"
+                      style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
+                    <Label text="REPORTE DE INVENTARIO"
+                           style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #203247;"/>
+                    <Label text="Incluye modelos, marcas, género, talla, color, stock, precio final, valorizado por variante y totales generales."
+                           wrapText="true" style="-fx-font-size: 13px; -fx-text-fill: #64748b;"/>
+                    <Label fx:id="lblConteoInventario" text="Consultando inventario..."
+                           style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #2563eb;"/>
+                    <Region VBox.vgrow="ALWAYS"/>
+                    <Button fx:id="btnGenerarInventario" text="📄   Generar PDF de Inventario"
+                            onAction="#handleGenerarInventario" maxWidth="Infinity"
+                            style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 16; -fx-background-radius: 6; -fx-cursor: hand;"/>
+                </VBox>
+
+                <!-- Reporte 2: Usuarios -->
+                <VBox spacing="12" GridPane.columnIndex="1" GridPane.rowIndex="0"
+                      style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
+                    <Label text="REPORTE DE USUARIOS"
+                           style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #203247;"/>
+                    <Label text="Lista todas las cuentas del sistema con nombre completo, correo, teléfono, rol, estado (activo/inactivo) y fecha de registro."
+                           wrapText="true" style="-fx-font-size: 13px; -fx-text-fill: #64748b;"/>
+                    <Label fx:id="lblConteoUsuarios" text="Consultando usuarios..."
+                           style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #7c3aed;"/>
+                    <Region VBox.vgrow="ALWAYS"/>
+                    <Button fx:id="btnGenerarUsuarios" text="📄   Generar PDF de Usuarios"
+                            onAction="#handleGenerarUsuarios" maxWidth="Infinity"
+                            style="-fx-background-color: #7c3aed; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 16; -fx-background-radius: 6; -fx-cursor: hand;"/>
+                </VBox>
+
+                <!-- Reporte 3: Ventas -->
+                <VBox spacing="12" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.columnSpan="2"
+                      style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
+                    <HBox alignment="CENTER_LEFT" spacing="12">
+                        <VBox spacing="4" HBox.hgrow="ALWAYS">
+                            <Label text="REPORTE DE VENTAS Y FACTURACIÓN"
+                                   style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #203247;"/>
+                            <Label text="Detalle de facturas emitidas, cliente, método de pago, estado, artículos vendidos, subtotal, IVA (15%) y total general."
+                                   wrapText="true" style="-fx-font-size: 13px; -fx-text-fill: #64748b;"/>
+                        </VBox>
+                        <Label fx:id="lblConteoVentas" text="Consultando ventas..."
+                               style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #0f9f75;"/>
+                    </HBox>
+
+                    <HBox alignment="CENTER_LEFT" spacing="12"
+                          style="-fx-background-color: #f8fafc; -fx-padding: 10 12; -fx-background-radius: 6; -fx-border-color: #e2e8f0; -fx-border-radius: 6;">
+                        <Label text="Filtrar período (opcional):" style="-fx-font-weight: bold; -fx-text-fill: #334155;"/>
+                        <Label text="Desde:" style="-fx-text-fill: #475569;"/>
+                        <DatePicker fx:id="dpVentasDesde" promptText="Todas" prefWidth="150"/>
+                        <Label text="Hasta:" style="-fx-text-fill: #475569;"/>
+                        <DatePicker fx:id="dpVentasHasta" promptText="Todas" prefWidth="150"/>
+                        <Button text="Limpiar fechas" onAction="#handleLimpiarFechasVentas"
+                                style="-fx-background-color: #64748b; -fx-text-fill: white; -fx-background-radius: 5; -fx-padding: 6 12; -fx-cursor: hand;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="btnGenerarVentas" text="📄   Generar PDF de Ventas"
+                                onAction="#handleGenerarVentas"
+                                style="-fx-background-color: #0f9f75; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 22; -fx-background-radius: 6; -fx-cursor: hand;"/>
+                    </HBox>
+                </VBox>
+            </GridPane>
+        </VBox>
+    </content>
+</ScrollPane>

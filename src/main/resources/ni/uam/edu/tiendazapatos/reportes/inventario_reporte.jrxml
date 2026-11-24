@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport name="inventario_reporte" language="java" pageWidth="792" pageHeight="612" orientation="Landscape"
+              columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20"
+              uuid="a1010000-1111-4000-8000-000000000001">
+
+    <parameter name="NOMBRE_TIENDA" class="java.lang.String"/>
+    <parameter name="TITULO_REPORTE" class="java.lang.String"/>
+    <parameter name="FECHA_GENERACION" class="java.lang.String"/>
+    <parameter name="GENERADO_POR" class="java.lang.String"/>
+    <parameter name="TOTAL_UNIDADES" class="java.lang.Integer"/>
+    <parameter name="VALOR_INVENTARIO" class="java.lang.Double"/>
+
+    <field name="modelo" class="java.lang.String"/>
+    <field name="marca" class="java.lang.String"/>
+    <field name="genero" class="java.lang.String"/>
+    <field name="talla" class="java.lang.String"/>
+    <field name="color" class="java.lang.String"/>
+    <field name="stock" class="java.lang.Integer"/>
+    <field name="precioFinal" class="java.lang.Double"/>
+    <field name="valorInventario" class="java.lang.Double"/>
+    <field name="estado" class="java.lang.String"/>
+
+    <variable name="SUM_STOCK" class="java.lang.Integer" calculation="Sum">
+        <expression><![CDATA[$F{stock} == null ? 0 : $F{stock}]]></expression>
+    </variable>
+    <variable name="SUM_VALOR" class="java.lang.Double" calculation="Sum">
+        <expression><![CDATA[$F{valorInventario} == null ? 0.0 : $F{valorInventario}]]></expression>
+    </variable>
+
+    <title height="78" splitType="Stretch">
+            <element kind="rectangle" uuid="a1010000-1111-4000-8000-000000000002" x="0" y="0" width="752" height="68" backcolor="#203247">
+                <pen lineWidth="0.0"/>
+            </element>
+            <element kind="textField" uuid="a1010000-1111-4000-8000-000000000003" x="14" y="8" width="440" height="24"
+                     forecolor="#FFFFFF" fontName="SansSerif" fontSize="16.0" bold="true" vTextAlign="Middle">
+                <expression><![CDATA[$P{NOMBRE_TIENDA}]]></expression>
+            </element>
+            <element kind="textField" uuid="a1010000-1111-4000-8000-000000000004" x="14" y="34" width="440" height="22"
+                     forecolor="#CBD5E1" fontName="SansSerif" fontSize="11.0" bold="true" vTextAlign="Middle">
+                <expression><![CDATA[$P{TITULO_REPORTE}]]></expression>
+            </element>
+            <element kind="textField" uuid="a1010000-1111-4000-8000-000000000005" x="465" y="10" width="273" height="20"
+                     forecolor="#E2E8F0" fontName="SansSerif" fontSize="9.5" hTextAlign="Right" vTextAlign="Middle">
+                <expression><![CDATA["Fecha: " + $P{FECHA_GENERACION}]]></expression>
+            </element>
+            <element kind="textField" uuid="a1010000-1111-4000-8000-000000000006" x="465" y="34" width="273" height="20"
+                     forecolor="#CBD5E1" fontName="SansSerif" fontSize="9.5" hTextAlign="Right" vTextAlign="Middle">
+                <expression><![CDATA["Generado por: " + $P{GENERADO_POR}]]></expression>
+            </element>
+    </title>
+
+    <columnHeader height="26" splitType="Stretch">
+            <element kind="staticText" uuid="a1010000-1111-4000-8000-000000000010" mode="Opaque" x="0" y="0" width="150" height="26"
+                     backcolor="#293F58" forecolor="#FFFFFF" fontName="SansSerif" fontSize="9.5" bold="true" vTextAlign="Middle">
+                <text><![CDATA[Modelo]]></text>
+                <box leftPadding="6" rightPadding="4"><pen lineWidth="0.5" lineColor="#1E293B"/></box>
+            </element>
+            <element kind="staticText" uuid="a1010000-1111-4000-8000-000000000011" mode="Opaque" x="150" y="0" width="75" height="26"
+                     backcolor="#293F58" forecolor="#FFFFFF" fontName="SansSerif" fontSize="9.5" bold="true" hTextAlign="Center" vTextAlign="Middle">
+                <text><![CDATA[Marca]]></text>
+                <box leftPadding="4" rightPadding="4"><pen lineWidth="0.5" lineColor="#1E293B"/></box>
+            </element>
+            <element kind="staticText" uuid="a1010000-1111-4000-8000-000000000012" mode="Opaque" x="225" y="0" width="65" height="26"
+                     backcolor="#293F58" forecolor="#FFFFFF" fontName="SansSerif" fontSize="9.5" bold="true" hTextAlign="Center" vTextAlign="Middle">
+                <text><![CDATA[Género]]></text>
+                <box leftPadding="4" rightPadding="4"><pen lineWidth="0.5" lineColor="#1E293B"/></box>
+            </element>
+            <element kind="staticText" uuid="a1010000-1111-4000-8000-000000000013" mode="Opaque" x="290" y="0" width="60" height="26"
+                     backcolor="#293F58" forecolor="#FFFFFF" fontName="SansSerif" fontSize="9.5" bold="true" hTextAlign="Center" vTextAlign="Middle">
+                <text><![CDATA[Talla]]></text>
+                <box leftPadding="4" rightPadding="4"><pen lineWidth="0.5" lineColor="#1E293B"/></box>
+            </element>
+            <element kind="staticText" uuid="a1010000-1111-4000-8000-000000000014" mode="Opaque" x="350" y="0" width="70" height="26"
+                     backcolor="#293F58" forecolor="#FFFFFF" fontName="SansSerif" fontSize="9.5" bold="true" hTextAlign="Center" vTextAlign="Middle">
+                <text><![CDATA[Color]]></text>
+                <box leftPadding="4" rightPadding="4"><pen lineWidth="0.5" lineColor="#1E293B"/></box>
+            </element>
+            <element kind="staticText" uuid="a1010000-1111-4000-8000-000000000015" mode="Opaque" x="420" y="0" width="52" height="26"
+                     backcolor="#293F58" forecolor="#FFFFFF" fontName="SansSerif" fontSize="9.5" bold="true" hTextAlign="Right" vTextAlign="Middle">
+                <text><![CDATA[Stock]]></text>
+                <box leftPadding="4" rightPadding="6"><pen lineWidth="0.5" lineColor="#1E293B"/></box>
+            </element>
+            <element kind="staticText" uuid="a1010000-1111-4000-8000-000000000016" mode="Opaque" x="472" y="0" width="90" height="26"
+                     backcolor="#293F58" forecolor="#FFFFFF" fontName="SansSerif" fontSize="9.5" bold="true" hTextAlign="Right" vTextAlign="Middle">
+                <text><![CDATA[Precio Final]]></text>
+                <box leftPadding="4" rightPadding="6"><pen lineWidth="0.5" lineColor="#1E293B"/></box>
+            </element>
+            <element kind="staticText" uuid="a1010000-1111-4000-8000-000000000017" mode="Opaque" x="562" y="0" width="105" height="26"
+                     backcolor="#293F58" forecolor="#FFFFFF" fontName="SansSerif" fontSize="9.5" bold="true" hTextAlign="Right" vTextAlign="Middle">
+                <text><![CDATA[Valor Stock]]></text>
+                <box leftPadding="4" rightPadding="6"><pen lineWidth="0.5" lineColor="#1E293B"/></box>
+            </element>
+            <element kind="staticText" uuid="a1010000-1111-4000-8000-000000000018" mode="Opaque" x="667" y="0" width="85" height="26"
+                     backcolor="#293F58" forecolor="#FFFFFF" fontName="SansSerif" fontSize="9.5" bold="true" hTextAlign="Center" vTextAlign="Middle">
+                <text><![CDATA[Estado]]></text>
+                <box leftPadding="4" rightPadding="4"><pen lineWidth="0.5" lineColor="#1E293B"/></box>
+            </element>
+    </columnHeader>
+
+    <detail>
+        <band height="22" splitType="Stretch">
+            <element kind="textField" uuid="a1010000-1111-4000-8000-000000000020" x="0" y="0" width="150" height="22"
+                     fontName="SansSerif" fontSize="9.0" vTextAlign="Middle" textAdjust="StretchHeight" stretchType="ElementGroupHeight" blankWhenNull="true">
+                <expression><![CDATA[$F{modelo}]]></expression>
+                <box topPadding="3" bottomPadding="3" leftPadding="6" rightPadding="4"><bottomPen lineWidth="0.5" lineColor="#CBD5E1"/></box>
+            </element>
+            <element kind="textField" uuid="a1010000-1111-4000-8000-000000000021" x="150" y="0" width="75" height="22"
+                     fontName="SansSerif" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle" stretchType="ElementGroupHeight" blankWhenNull="true">
+                <expression><![CDATA[$F{marca}]]></expression>
+                <box topPadding="3" bottomPadding="3" leftPadding="4" rightPadding="4"><bottomPen lineWidth="0.5" lineColor="#CBD5E1"/></box>
+            </element>
+            <element kind="textField" uuid="a1010000-1111-4000-8000-000000000022" x="225" y="0" width="65" height="22"
+                     fontName="SansSerif" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle" stretchType="ElementGroupHeight" blankWhenNull="true">
+                <expression><![CDATA[$F{genero}]]></expression>
+                <box topPadding="3" bottomPadding="3" leftPadding="4" rightPadding="4"><bottomPen lineWidth="0.5" lineColor="#CBD5E1"/></box>
+            </element>
+            <element kind="textField" uuid="a1010000-1111-4000-8000-000000000023" x="290" y="0" width="60" height="22"
+                     fontName="SansSerif" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle" stretchType="ElementGroupHeight" blankWhenNull="true">
+                <expression><![CDATA[$F{talla}]]></expression>
+                <box topPadding="3" bottomPadding="3" leftPadding="4" rightPadding="4"><bottomPen lineWidth="0.5" lineColor="#CBD5E1"/></box>
+            </element>
+            <element kind="textField" uuid="a1010000-1111-4000-8000-000000000024" x="350" y="0" width="70" height="22"
+                     fontName="SansSerif" fontSize="9.0" hTextAlign="Center" vTextAlign="Middle" stretchType="ElementGroupHeight" blankWhenNull="true">
+                <expression><![CDATA[$F{color}]]></expression>
+                <box topPadding="3" bottomPadding="3" leftPadding="4" rightPadding="4"><bottomPen lineWidth="0.5" lineColor="#CBD5E1"/></box>
+            </element>
+            <element kind="textField" uuid="a1010000-1111-4000-8000-000000000025" x="420" y="0" width="52" height="22"
+                     fontName="SansSerif" fontSize="9.0" hTextAlign="Right" vTextAlign="Middle" pattern="#,##0" stretchType="ElementGroupHeight" blankWhenNull="true">
+                <expression><![CDATA[$F{stock}]]></expression>
+                <box topPadding="3" bottomPadding="3" leftPadding="4" rightPadding="6"><bottomPen lineWidth="0.5" lineColor="#CBD5E1"/></box>
+            </element>
+            <element kind="textField" uuid="a1010000-1111-4000-8000-000000000026" x="472" y="0" width="90" height="22"
+                     fontName="SansSerif" fontSize="9.0" hTextAlign="Right" vTextAlign="Middle" pattern="C$ #,##0.00" stretchType="ElementGroupHeight" blankWhenNull="true">
+                <expression><![CDATA[$F{precioFinal}]]></expression>
+                <box topPadding="3" bottomPadding="3" leftPadding="4" rightPadding="6"><bottomPen lineWidth="0.5" lineColor="#CBD5E1"/></box>
+            </element>
+            <element kind="textField" uuid="a1010000-1111-4000-8000-000000000027" x="562" y="0" width="105" height="22"
+                     fontName="SansSerif" fontSize="9.0" hTextAlign="Right" vTextAlign="Middle" pattern="C$ #,##0.00" stretchType="ElementGroupHeight" blankWhenNull="true">
+                <expression><![CDATA[$F{valorInventario}]]></expression>
+                <box topPadding="3" bottomPadding="3" leftPadding="4" rightPadding="6"><bottomPen lineWidth="0.5" lineColor="#CBD5E1"/></box>
+            </element>
+            <element kind="textField" uuid="a1010000-1111-4000-8000-000000000028" x="667" y="0" width="85" height="22"
+                     fontName="SansSerif" fontSize="9.0" bold="true" hTextAlign="Center" vTextAlign="Middle" stretchType="ElementGroupHeight" blankWhenNull="true">
+                <expression><![CDATA[$F{estado}]]></expression>
+                <box topPadding="3" bottomPadding="3" leftPadding="4" rightPadding="4"><bottomPen lineWidth="0.5" lineColor="#CBD5E1"/></box>
+            </element>
+        </band>
+    </detail>
+
+    <pageFooter height="24" splitType="Stretch">
+            <element kind="staticText" uuid="a1010000-1111-4000-8000-000000000030" x="0" y="6" width="460" height="16"
+                     forecolor="#64748B" fontName="SansSerif" fontSize="8.5" vTextAlign="Middle">
+                <text><![CDATA[Tienda de Zapatos — Reporte de Inventario generado desde el Panel de Administrador]]></text>
+            </element>
+            <element kind="textField" uuid="a1010000-1111-4000-8000-000000000031" x="580" y="6" width="124" height="16"
+                     forecolor="#64748B" fontName="SansSerif" fontSize="8.5" hTextAlign="Right" vTextAlign="Middle">
+                <expression><![CDATA["Página " + $V{PAGE_NUMBER} + " de"]]></expression>
+            </element>
+            <element kind="textField" uuid="a1010000-1111-4000-8000-000000000032" x="708" y="6" width="44" height="16"
+                     forecolor="#64748B" fontName="SansSerif" fontSize="8.5" evaluationTime="Report" hTextAlign="Left" vTextAlign="Middle">
+                <expression><![CDATA[$V{PAGE_NUMBER}]]></expression>
+            </element>
+    </pageFooter>
+
+    <summary height="54" splitType="Stretch">
+            <element kind="rectangle" uuid="a1010000-1111-4000-8000-000000000040" x="0" y="10" width="752" height="36" backcolor="#F1F5F9">
+                <pen lineWidth="0.75" lineColor="#CBD5E1"/>
+            </element>
+            <element kind="textField" uuid="a1010000-1111-4000-8000-000000000041" x="14" y="16" width="230" height="24"
+                     forecolor="#203247" fontName="SansSerif" fontSize="10.0" bold="true" vTextAlign="Middle">
+                <expression><![CDATA["Total registros / variantes: " + $V{REPORT_COUNT}]]></expression>
+            </element>
+            <element kind="textField" uuid="a1010000-1111-4000-8000-000000000042" x="255" y="16" width="215" height="24"
+                     forecolor="#203247" fontName="SansSerif" fontSize="10.0" bold="true" hTextAlign="Center" vTextAlign="Middle">
+                <expression><![CDATA["Unidades en stock: " + $V{SUM_STOCK}]]></expression>
+            </element>
+            <element kind="textField" uuid="a1010000-1111-4000-8000-000000000043" x="480" y="16" width="258" height="24"
+                     forecolor="#0F766E" fontName="SansSerif" fontSize="10.5" bold="true" hTextAlign="Right" vTextAlign="Middle"
+                     pattern="'Valor total inventario: C$ '#,##0.00">
+                <expression><![CDATA[$V{SUM_VALOR}]]></expression>
+            </element>
+    </summary>
+</jasperReport>

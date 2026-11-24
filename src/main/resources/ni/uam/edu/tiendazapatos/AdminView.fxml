@@ -47,6 +47,9 @@
             <Button fx:id="btnNavUsuarios" text="👥   Gestión de usuarios" onAction="#mostrarUsuarios" maxWidth="Infinity"
                     alignment="CENTER_LEFT"
                     style="-fx-background-color: transparent; -fx-text-fill: white; -fx-cursor: hand; -fx-padding: 12 16; -fx-font-size: 14px;"/>
+            <Button fx:id="btnNavReportes" text="📄   Reportes" onAction="#mostrarReportes" maxWidth="Infinity"
+                    alignment="CENTER_LEFT"
+                    style="-fx-background-color: transparent; -fx-text-fill: white; -fx-cursor: hand; -fx-padding: 12 16; -fx-font-size: 14px;"/>
             <Region VBox.vgrow="ALWAYS"/>
             <Label text="Sistema de control de inventario y ventas"
                    wrapText="true"
@@ -154,6 +157,17 @@
                                                    wrapText="true" style="-fx-text-fill: #65758b; -fx-font-size: 13px;"/>
                                             <Button text="Gestionar usuarios" onAction="#mostrarUsuarios" maxWidth="Infinity"
                                                     style="-fx-background-color: #7c3aed; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10; -fx-cursor: hand; -fx-background-radius: 6;"/>
+                                        </VBox>
+
+                                        <!-- Tarjeta 5: Reportes PDF -->
+                                        <VBox spacing="14" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.columnSpan="2"
+                                              style="-fx-background-color: white; -fx-padding: 22; -fx-background-radius: 12; -fx-border-color: #e3e9f0; -fx-border-radius: 12;">
+                                            <Label text="REPORTES EN PDF"
+                                                   style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #203247;"/>
+                                            <Label text="Generá y exportá reportes PDF de inventario, usuarios y ventas con JasperReports."
+                                                   wrapText="true" style="-fx-text-fill: #65758b; -fx-font-size: 13px;"/>
+                                            <Button text="Abrir reportes" onAction="#mostrarReportes" maxWidth="Infinity"
+                                                    style="-fx-background-color: #0f766e; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10; -fx-cursor: hand; -fx-background-radius: 6;"/>
                                         </VBox>
                                     </GridPane>
                                 </VBox>

@@ -34,6 +34,7 @@ public class AdminViewController {
     @FXML private Button btnNavVentas;
     @FXML private Button btnNavHistorialVentas;
     @FXML private Button btnNavUsuarios;
+    @FXML private Button btnNavReportes;
     @FXML private Button btnVolver;
     @FXML private Label lblRuta;
     @FXML private Label lblFechaActual;
@@ -45,8 +46,9 @@ public class AdminViewController {
     private Parent vistaVentas;
     private Parent vistaHistorialVentas;
     private Parent vistaUsuarios;
+    private Parent vistaReportes;
 
-    private enum Seccion { INICIO, INVENTARIO, VENTAS, HISTORIAL_VENTAS, USUARIOS }
+    private enum Seccion { INICIO, INVENTARIO, VENTAS, HISTORIAL_VENTAS, USUARIOS, REPORTES }
     private Seccion seccionActual = Seccion.INICIO;
     private final Deque<Seccion> historial = new ArrayDeque<>();
 
@@ -111,6 +113,11 @@ public class AdminViewController {
     }
 
     @FXML
+    private void mostrarReportes() {
+        cambiarSeccion(Seccion.REPORTES, true);
+    }
+
+    @FXML
     private void mostrarRegistro() {
         mostrarUsuarios();
     }
@@ -166,6 +173,10 @@ public class AdminViewController {
                 if (vistaUsuarios == null) vistaUsuarios = cargarVista("GestionUsuariosView.fxml");
                 yield vistaUsuarios;
             }
+            case REPORTES -> {
+                if (vistaReportes == null) vistaReportes = cargarVista("ReportesView.fxml");
+                yield vistaReportes;
+            }
         };
     }
 
@@ -176,6 +187,7 @@ public class AdminViewController {
             case VENTAS -> "Facturación";
             case HISTORIAL_VENTAS -> "Historial de ventas";
             case USUARIOS -> "Gestión de usuarios";
+            case REPORTES -> "Reportes";
         };
     }
 
@@ -185,6 +197,7 @@ public class AdminViewController {
         marcarActivo(btnNavVentas, seccionActual == Seccion.VENTAS);
         marcarActivo(btnNavHistorialVentas, seccionActual == Seccion.HISTORIAL_VENTAS);
         marcarActivo(btnNavUsuarios, seccionActual == Seccion.USUARIOS);
+        marcarActivo(btnNavReportes, seccionActual == Seccion.REPORTES);
 
         lblRuta.setText(nombreSeccion(seccionActual));
         boolean hayAnterior = seccionActual != Seccion.INICIO && !historial.isEmpty();
