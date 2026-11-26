@@ -281,6 +281,124 @@ public class ReporteService {
         return datos.size();
     }
 
+    public List<DetalleVentaReporteItem> obtenerDatosVentasDetalle(LocalDate desde, LocalDate hasta) {
+        if (desde != null && hasta != null && desde.isAfter(hasta)) {
+            throw new IllegalArgumentException("La fecha inicial no puede ser posterior a la fecha final.");
+        }
+
+        List<Venta> ventas = ventaDAO.obtenerTodas();
+        if (ventas == null || ventas.isEmpty()) {
+            return List.of();
+        }
+
+        Map<UUID, String> mapaUsuarios = new HashMap<>();
+        List<Usuario> usuarios = usuarioDAO.obtenerTodos();
+        if (usuarios != null) {
+            for (Usuario u : usuarios) {
+                String nombre = (u.getNombreCompleto() != null && !u.getNombreCompleto().isBlank())
+                        ? u.getNombreCompleto()
+                        : u.getNombreUsuario();
+                mapaUsuarios.put(u.getUsuarioId(), nombre);
+            }
+        }
+
+        Map<UUID, VentaDAO.InfoInventario> infoInv = ventaDAO.obtenerInfoCompletaInventario();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        List<DetalleVentaReporteItem> items = new ArrayList<>();
+
+        for (Venta v : ventas) {
+            if (v.getFechaVenta() != null && (desde != null || hasta != null)) {
+                LocalDate fechaLocal = v.getFechaVenta().toInstant()
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate();
+                if (desde != null && fechaLocal.isBefore(desde)) {
+                    continue;
+                }
+                if (hasta != null && fechaLocal.isAfter(hasta)) {
+                    continue;
+                }
+            } else if ((desde != null || hasta != null) && v.getFechaVenta() == null) {
+                continue;
+            }
+
+            String numVenta = textoSeguro(v.getNumeroVenta(), "—");
+            String fecha = v.getFechaVenta() != null ? sdf.format(v.getFechaVenta()) : "—";
+            String vendedor = v.getVendedorId() != null
+                    ? mapaUsuarios.getOrDefault(v.getVendedorId(), "Vendedor #" + v.getVendedorId().toString().substring(0, 8))
+                    : "No asignado";
+            String metodoPago = textoSeguro(v.getMetodoPago(), "—");
+            double ivaVenta = v.getImpuesto();
+            double totalVenta = v.getTotal();
+
+            if (v.getDetalles() != null && !v.getDetalles().isEmpty()) {
+                for (DetalleVenta d : v.getDetalles()) {
+                    VentaDAO.InfoInventario info = d.getInventarioId() != null ? infoInv.get(d.getInventarioId()) : null;
+                    String prod = info != null ? info.getProducto() : "Calzado (" + d.getInventarioId() + ")";
+                    String var = info != null ? info.getVariante() : "—";
+                    items.add(new DetalleVentaReporteItem(
+                            numVenta,
+                            fecha,
+                            vendedor,
+                            metodoPago,
+                            ivaVenta,
+                            totalVenta,
+                            prod,
+                            var,
+                            d.getCantidad(),
+                            d.getPrecioUnitario(),
+                            d.getSubtotal()
+                    ));
+                }
+            } else {
+                items.add(new DetalleVentaReporteItem(
+                        numVenta,
+                        fecha,
+                        vendedor,
+                        metodoPago,
+                        ivaVenta,
+                        totalVenta,
+                        "Sin desglose registrado",
+                        "—",
+                        0,
+                        0.0,
+                        v.getSubtotal()
+                ));
+            }
+        }
+        return items;
+    }
+
+    public int generarReporteVentasDetalle(File destinoPdf, LocalDate desde, LocalDate hasta) throws JRException, IOException {
+        List<DetalleVentaReporteItem> datos = obtenerDatosVentasDetalle(desde, hasta);
+        if (datos.isEmpty()) {
+            throw new SinDatosReporteException(
+                    (desde != null || hasta != null)
+                            ? "No se encontraron detalles de ventas en el rango de fechas seleccionado."
+                            : "No hay ventas registradas en la base de datos todavía."
+            );
+        }
+
+        java.util.Set<String> facturasContadas = new java.util.HashSet<>();
+        double granTotalIva = 0.0;
+        double granTotal = 0.0;
+        for (DetalleVentaReporteItem item : datos) {
+            if (facturasContadas.add(item.getNumeroVenta())) {
+                granTotalIva += item.getIvaVenta() != null ? item.getIvaVenta() : 0.0;
+                granTotal += item.getTotalVenta() != null ? item.getTotalVenta() : 0.0;
+            }
+        }
+
+        String rangoTexto = construirTextoRango(desde, hasta);
+        Map<String, Object> parametros = crearParametrosBase("REPORTE DETALLADO DE VENTAS POR PRODUCTO");
+        parametros.put("RANGO_FECHAS", rangoTexto);
+        parametros.put("TOTAL_FACTURAS", facturasContadas.size());
+        parametros.put("GRAN_TOTAL_IVA", granTotalIva);
+        parametros.put("GRAN_TOTAL", granTotal);
+
+        exportarPdf("ventas_detalle_reporte.jrxml", parametros, datos, destinoPdf);
+        return datos.size();
+    }
+
     private void exportarPdf(
             String nombrePlantilla,
             Map<String, Object> parametros,

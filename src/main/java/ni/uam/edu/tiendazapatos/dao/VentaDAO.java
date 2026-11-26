@@ -95,6 +95,55 @@ public class VentaDAO {
         }
     }
 
+    public static class InfoInventario {
+        private final String producto;
+        private final String variante;
+
+        public InfoInventario(String producto, String variante) {
+            this.producto = producto;
+            this.variante = variante;
+        }
+
+        public String getProducto() { return producto; }
+        public String getVariante() { return variante; }
+    }
+
+    public Map<UUID, InfoInventario> obtenerInfoCompletaInventario() {
+        EntityManager em = HibernateUtil.getEntityManager();
+        try {
+            List<?> rows = em.createNativeQuery("""
+                SELECT i.inventario_id, z.nombre, COALESCE(m.nombre, 'Sin marca'), i.genero, i.sistema_talla, i.talla, i.color
+                FROM public.inventario i
+                JOIN public.zapatos z ON i.zapato_id = z.zapato_id
+                LEFT JOIN public.marcas m ON z.marca_id = m.marca_id
+            """).getResultList();
+
+            Map<UUID, InfoInventario> mapa = new HashMap<>();
+            for (Object r : rows) {
+                Object[] f = (Object[]) r;
+                UUID invId = (UUID) f[0];
+                String zNombre = (String) f[1];
+                String mNombre = (String) f[2];
+                String genero = f[3] != null ? f[3].toString() : "—";
+                String sistema = f[4] != null ? f[4].toString() : "";
+                String talla = f[5] != null ? f[5].toString() : "";
+                String color = f[6] != null ? f[6].toString() : "—";
+
+                String producto = String.format("%s (%s)", zNombre != null ? zNombre : "Calzado", mNombre);
+                String tallaCompleta = (sistema + " " + talla).trim();
+                String variante = String.format("%s | %s | %s", genero, tallaCompleta.isEmpty() ? "—" : tallaCompleta, color);
+
+                mapa.put(invId, new InfoInventario(producto, variante));
+            }
+            return mapa;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new HashMap<>();
+        } finally {
+            em.close();
+        }
+    }
+
     public List<Venta> obtenerPorVendedor(UUID vendedorId, java.time.LocalDate desde, java.time.LocalDate hasta) {
         EntityManager em = HibernateUtil.getEntityManager();
         try {
