@@ -104,6 +104,36 @@
                                 style="-fx-background-color: #0f9f75; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 22; -fx-background-radius: 6; -fx-cursor: hand;"/>
                     </HBox>
                 </VBox>
+
+                <!-- Reporte 4: Ventas por Producto (Desglose Detallado) -->
+                <VBox spacing="12" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.columnSpan="2"
+                      style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 10; -fx-border-color: #e2e8f0; -fx-border-radius: 10;">
+                    <HBox alignment="CENTER_LEFT" spacing="12">
+                        <VBox spacing="4" HBox.hgrow="ALWAYS">
+                            <Label text="REPORTE DE VENTAS POR PRODUCTO (DESGLOSE DETALLADO)"
+                                   style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #203247;"/>
+                            <Label text="Desglose línea por línea de cada artículo vendido agrupado por factura, incluyendo modelo, variante (talla, género, color), vendedor responsable, cantidad, precio unitario y subtotales."
+                                   wrapText="true" style="-fx-font-size: 13px; -fx-text-fill: #64748b;"/>
+                        </VBox>
+                        <Label fx:id="lblConteoDetalleVentas" text="Consultando líneas..."
+                               style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #0284c7;"/>
+                    </HBox>
+
+                    <HBox alignment="CENTER_LEFT" spacing="12"
+                          style="-fx-background-color: #f8fafc; -fx-padding: 10 12; -fx-background-radius: 6; -fx-border-color: #e2e8f0; -fx-border-radius: 6;">
+                        <Label text="Filtrar período (opcional):" style="-fx-font-weight: bold; -fx-text-fill: #334155;"/>
+                        <Label text="Desde:" style="-fx-text-fill: #475569;"/>
+                        <DatePicker fx:id="dpDetalleDesde" promptText="Todas" prefWidth="150"/>
+                        <Label text="Hasta:" style="-fx-text-fill: #475569;"/>
+                        <DatePicker fx:id="dpDetalleHasta" promptText="Todas" prefWidth="150"/>
+                        <Button text="Limpiar fechas" onAction="#handleLimpiarFechasDetalle"
+                                style="-fx-background-color: #64748b; -fx-text-fill: white; -fx-background-radius: 5; -fx-padding: 6 12; -fx-cursor: hand;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="btnGenerarVentasDetalle" text="📄   Generar PDF Detallado por Producto"
+                                onAction="#handleGenerarVentasDetalle"
+                                style="-fx-background-color: #0284c7; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 22; -fx-background-radius: 6; -fx-cursor: hand;"/>
+                    </HBox>
+                </VBox>
             </GridPane>
         </VBox>
     </content>

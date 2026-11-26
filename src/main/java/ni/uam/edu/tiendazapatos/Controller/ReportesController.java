@@ -24,15 +24,19 @@ public class ReportesController {
     @FXML private Label lblConteoInventario;
     @FXML private Label lblConteoUsuarios;
     @FXML private Label lblConteoVentas;
+    @FXML private Label lblConteoDetalleVentas;
     @FXML private Label lblEstadoReporte;
 
     @FXML private DatePicker dpVentasDesde;
     @FXML private DatePicker dpVentasHasta;
+    @FXML private DatePicker dpDetalleDesde;
+    @FXML private DatePicker dpDetalleHasta;
     @FXML private CheckBox chkAbrirAlGenerar;
 
     @FXML private Button btnGenerarInventario;
     @FXML private Button btnGenerarUsuarios;
     @FXML private Button btnGenerarVentas;
+    @FXML private Button btnGenerarVentasDetalle;
     @FXML private Button btnActualizarResumen;
 
     private final ReporteService reporteService = new ReporteService();
@@ -49,6 +53,12 @@ public class ReportesController {
         if (dpVentasHasta != null) {
             dpVentasHasta.valueProperty().addListener((obs, ant, nuevo) -> actualizarConteoVentas());
         }
+        if (dpDetalleDesde != null) {
+            dpDetalleDesde.valueProperty().addListener((obs, ant, nuevo) -> actualizarConteoVentasDetalle());
+        }
+        if (dpDetalleHasta != null) {
+            dpDetalleHasta.valueProperty().addListener((obs, ant, nuevo) -> actualizarConteoVentasDetalle());
+        }
         actualizarResumen();
     }
 
@@ -63,6 +73,13 @@ public class ReportesController {
         dpVentasDesde.setValue(null);
         dpVentasHasta.setValue(null);
         actualizarConteoVentas();
+    }
+
+    @FXML
+    private void handleLimpiarFechasDetalle() {
+        if (dpDetalleDesde != null) dpDetalleDesde.setValue(null);
+        if (dpDetalleHasta != null) dpDetalleHasta.setValue(null);
+        actualizarConteoVentasDetalle();
     }
 
     @FXML
@@ -154,6 +171,44 @@ public class ReportesController {
             e.printStackTrace();
             mostrarAlerta(Alert.AlertType.ERROR, "Error al preparar reporte",
                     "No se pudieron consultar las ventas: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleGenerarVentasDetalle() {
+        LocalDate desde = dpDetalleDesde != null ? dpDetalleDesde.getValue() : null;
+        LocalDate hasta = dpDetalleHasta != null ? dpDetalleHasta.getValue() : null;
+
+        if (desde != null && hasta != null && desde.isAfter(hasta)) {
+            mostrarAlerta(Alert.AlertType.WARNING, "Rango de fechas inválido",
+                    "La fecha 'Desde' no puede ser posterior a la fecha 'Hasta'.");
+            return;
+        }
+
+        try {
+            var datos = reporteService.obtenerDatosVentasDetalle(desde, hasta);
+            if (datos.isEmpty()) {
+                mostrarAlerta(Alert.AlertType.WARNING, "Sin datos",
+                        (desde != null || hasta != null)
+                                ? "No hay líneas de ventas registradas en el rango de fechas seleccionado."
+                                : "No hay ventas registradas en la base de datos todavía.");
+                return;
+            }
+            File destino = pedirArchivoDestino(
+                    "Guardar Reporte de Ventas por Producto",
+                    "Reporte_Ventas_Por_Producto_" + LocalDate.now().format(FORMATO_ARCHIVO) + ".pdf"
+            );
+            if (destino == null) return;
+
+            ejecutarExportacion(
+                    "Ventas por Producto",
+                    destino,
+                    () -> reporteService.generarReporteVentasDetalle(destino, desde, hasta)
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta(Alert.AlertType.ERROR, "Error al preparar reporte",
+                    "No se pudieron consultar las ventas por producto: " + e.getMessage());
         }
     }
 
@@ -280,6 +335,7 @@ public class ReportesController {
         }
 
         actualizarConteoVentas();
+        actualizarConteoVentasDetalle();
     }
 
     private void actualizarConteoVentas() {
@@ -301,10 +357,35 @@ public class ReportesController {
         }
     }
 
+    private void actualizarConteoVentasDetalle() {
+        try {
+            if (lblConteoDetalleVentas == null) return;
+            LocalDate desde = dpDetalleDesde != null ? dpDetalleDesde.getValue() : null;
+            LocalDate hasta = dpDetalleHasta != null ? dpDetalleHasta.getValue() : null;
+            if (desde != null && hasta != null && desde.isAfter(hasta)) {
+                lblConteoDetalleVentas.setText("Rango inválido (Desde > Hasta)");
+                return;
+            }
+            int totalDet = reporteService.obtenerDatosVentasDetalle(desde, hasta).size();
+            if (totalDet == 0) {
+                lblConteoDetalleVentas.setText("0 líneas disponibles para este criterio");
+            } else {
+                lblConteoDetalleVentas.setText(totalDet + (totalDet == 1 ? " línea de venta disponible" : " líneas de venta disponibles"));
+            }
+        } catch (Exception e) {
+            if (lblConteoDetalleVentas != null) {
+                lblConteoDetalleVentas.setText("Error al consultar");
+            }
+        }
+    }
+
     private void establecerOcupado(boolean ocupado, String estadoTexto) {
         btnGenerarInventario.setDisable(ocupado);
         btnGenerarUsuarios.setDisable(ocupado);
         btnGenerarVentas.setDisable(ocupado);
+        if (btnGenerarVentasDetalle != null) {
+            btnGenerarVentasDetalle.setDisable(ocupado);
+        }
         btnActualizarResumen.setDisable(ocupado);
         if (lblEstadoReporte != null) {
             lblEstadoReporte.setText(estadoTexto);
