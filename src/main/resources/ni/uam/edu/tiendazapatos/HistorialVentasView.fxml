@@ -92,6 +92,9 @@
                 <Label text="Desglose de Productos Vendidos" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #334155;"/>
                 <Label fx:id="lblDetalleFactura" text="(Seleccione una factura de arriba para ver sus productos)"
                        style="-fx-font-size: 13px; -fx-text-fill: #64748b; -fx-font-style: italic;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="btnDevolucionCambio" text="🔄 Procesar Devolución / Cambio" onAction="#handleProcesarDevolucionOCambio"
+                        style="-fx-background-color: #d97706; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-background-radius: 5; -fx-padding: 6 14;"/>
             </HBox>
 
             <TableView fx:id="tablaDetalles" VBox.vgrow="ALWAYS" prefHeight="160">

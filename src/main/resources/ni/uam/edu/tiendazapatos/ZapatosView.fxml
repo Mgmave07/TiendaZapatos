@@ -71,9 +71,11 @@
                 style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-padding: 10 20; -fx-background-radius: 6; -fx-cursor: hand;"/>
         <Button fx:id="btnEditar" text="Editar" onAction="#handleEditarZapato"
                 style="-fx-background-color: #FF9800; -fx-text-fill: white; -fx-padding: 10 20; -fx-background-radius: 6; -fx-cursor: hand;"/>
-        <Button text="+ Agregar Zapato" onAction="#handleAgregarZapato"
+        <Button fx:id="btnToggleActivo" text="🚫 Desactivar / Activar" onAction="#handleToggleActivoZapato"
+                style="-fx-background-color: #e11d48; -fx-text-fill: white; -fx-padding: 10 20; -fx-background-radius: 6; -fx-cursor: hand; -fx-font-weight: bold;"/>
+        <Button fx:id="btnAgregarZapato" text="+ Agregar Zapato" onAction="#handleAgregarZapato"
                 style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 10 20; -fx-background-radius: 6; -fx-cursor: hand;"/>
-        <Button text="Cerrar Sesión" onAction="#handleCerrarSesion"
+        <Button fx:id="btnCerrarSesion" text="Cerrar Sesión" onAction="#handleCerrarSesion"
                 style="-fx-background-color: #f44336; -fx-text-fill: white; -fx-padding: 10 20; -fx-background-radius: 6; -fx-cursor: hand;"/>
     </HBox>
 </VBox>

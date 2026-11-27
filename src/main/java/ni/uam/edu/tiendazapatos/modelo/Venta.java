@@ -41,6 +41,10 @@ public class Venta {
     @Column(name = "cliente_telefono", length = 20)
     private String clienteTelefono;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "cliente_id")
+    private Cliente cliente;
+
     @Column(name = "notas")
     private String notas;
 
@@ -152,6 +156,14 @@ public class Venta {
 
     public void setClienteTelefono(String clienteTelefono) {
         this.clienteTelefono = clienteTelefono;
+    }
+
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
     }
 
     public String getNotas() {

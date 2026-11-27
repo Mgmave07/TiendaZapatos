@@ -7,9 +7,14 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
+import ni.uam.edu.tiendazapatos.dao.InventarioDAO;
 import ni.uam.edu.tiendazapatos.dao.VentaDAO;
 import ni.uam.edu.tiendazapatos.modelo.DetalleVenta;
+import ni.uam.edu.tiendazapatos.modelo.InventarioFila;
 import ni.uam.edu.tiendazapatos.modelo.Venta;
 
 import java.text.SimpleDateFormat;
@@ -20,6 +25,8 @@ import java.util.*;
 public class HistorialVentasController {
 
     public record FilaDetalle(
+            UUID detalleId,
+            UUID inventarioId,
             String producto,
             int cantidad,
             double precioUnitario,
@@ -56,6 +63,8 @@ public class HistorialVentasController {
     @FXML private TableColumn<FilaDetalle, String> colDetalleSubtotal;
 
     private final VentaDAO ventaDAO = new VentaDAO();
+    private final InventarioDAO inventarioDAO = new InventarioDAO();
+
     private final ObservableList<Venta> listaVentas = FXCollections.observableArrayList();
     private final FilteredList<Venta> ventasFiltradas = new FilteredList<>(listaVentas, v -> true);
     private final ObservableList<FilaDetalle> listaDetalles = FXCollections.observableArrayList();
@@ -108,10 +117,12 @@ public class HistorialVentasController {
                     setText(item);
                     if ("PAGADA".equalsIgnoreCase(item)) {
                         setStyle("-fx-text-fill: #16a34a; -fx-font-weight: bold;");
-                    } else if ("CANCELADA".equalsIgnoreCase(item)) {
+                    } else if ("CANCELADA".equalsIgnoreCase(item) || "DEVUELTA".equalsIgnoreCase(item)) {
                         setStyle("-fx-text-fill: #dc2626; -fx-font-weight: bold;");
+                    } else if (item.contains("PARCIAL")) {
+                        setStyle("-fx-text-fill: #ea580c; -fx-font-weight: bold;");
                     } else {
-                        setStyle("-fx-text-fill: #eab308; -fx-font-weight: bold;");
+                        setStyle("-fx-text-fill: #ca8a04; -fx-font-weight: bold;");
                     }
                 }
             }
@@ -142,7 +153,7 @@ public class HistorialVentasController {
         cmbMetodoPago.getItems().setAll("Todos los métodos", "Efectivo", "Tarjeta", "Transferencia");
         cmbMetodoPago.getSelectionModel().selectFirst();
 
-        cmbEstadoVenta.getItems().setAll("Todos los estados", "PAGADA", "PENDIENTE", "CANCELADA");
+        cmbEstadoVenta.getItems().setAll("Todos los estados", "PAGADA", "PARCIALMENTE_DEVUELTA", "DEVUELTA", "CANCELADA");
         cmbEstadoVenta.getSelectionModel().selectFirst();
 
         txtBuscarFactura.textProperty().addListener((obs, ant, nuevo) -> aplicarFiltros());
@@ -172,37 +183,23 @@ public class HistorialVentasController {
         LocalDate hasta = dpFechaHasta.getValue();
 
         ventasFiltradas.setPredicate(v -> {
-            // 1. Filtro por número de factura
             if (!numFactura.isEmpty()) {
                 String num = v.getNumeroVenta() != null ? v.getNumeroVenta().toLowerCase(Locale.ROOT) : "";
-                if (!num.contains(numFactura)) {
-                    return false;
-                }
+                if (!num.contains(numFactura)) return false;
             }
 
-            // 2. Filtro por método de pago
             if (metodoSel != null && !"Todos los métodos".equalsIgnoreCase(metodoSel)) {
-                if (!metodoSel.equalsIgnoreCase(v.getMetodoPago())) {
-                    return false;
-                }
+                if (!metodoSel.equalsIgnoreCase(v.getMetodoPago())) return false;
             }
 
-            // 3. Filtro por estado
             if (estadoSel != null && !"Todos los estados".equalsIgnoreCase(estadoSel)) {
-                if (!estadoSel.equalsIgnoreCase(v.getEstado())) {
-                    return false;
-                }
+                if (!estadoSel.equalsIgnoreCase(v.getEstado())) return false;
             }
 
-            // 4. Filtro por fecha desde / hasta
             if (v.getFechaVenta() != null) {
                 LocalDate fechaVentaLocal = v.getFechaVenta().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                if (desde != null && fechaVentaLocal.isBefore(desde)) {
-                    return false;
-                }
-                if (hasta != null && fechaVentaLocal.isAfter(hasta)) {
-                    return false;
-                }
+                if (desde != null && fechaVentaLocal.isBefore(desde)) return false;
+                if (hasta != null && fechaVentaLocal.isAfter(hasta)) return false;
             }
 
             return true;
@@ -230,8 +227,8 @@ public class HistorialVentasController {
         }
 
         String fechaStr = venta.getFechaVenta() != null ? FORMATO_FECHA_HORA.format(venta.getFechaVenta()) : "";
-        lblDetalleFactura.setText(String.format("Factura: %s | Fecha: %s | Total: C$ %.2f | Método: %s",
-                venta.getNumeroVenta(), fechaStr, venta.getTotal(), venta.getMetodoPago()));
+        lblDetalleFactura.setText(String.format("Factura: %s | Fecha: %s | Total: C$ %.2f | Método: %s | Estado: %s",
+                venta.getNumeroVenta(), fechaStr, venta.getTotal(), venta.getMetodoPago(), venta.getEstado()));
 
         if (venta.getDetalles() != null) {
             for (DetalleVenta d : venta.getDetalles()) {
@@ -239,7 +236,179 @@ public class HistorialVentasController {
                 if (desc == null || desc.isBlank()) {
                     desc = "Producto ID: " + d.getInventarioId();
                 }
-                listaDetalles.add(new FilaDetalle(desc, d.getCantidad(), d.getPrecioUnitario(), d.getSubtotal()));
+                listaDetalles.add(new FilaDetalle(d.getDetalle_id(), d.getInventarioId(), desc, d.getCantidad(), d.getPrecioUnitario(), d.getSubtotal()));
+            }
+        }
+    }
+
+    @FXML
+    private void handleProcesarDevolucionOCambio() {
+        Venta ventaSeleccionada = tablaVentas.getSelectionModel().getSelectedItem();
+        FilaDetalle detalleSeleccionado = tablaDetalles.getSelectionModel().getSelectedItem();
+
+        if (ventaSeleccionada == null) {
+            mostrarAlerta(Alert.AlertType.WARNING, "Selección requerida", "Por favor, selecciona una factura de la tabla superior.");
+            return;
+        }
+
+        if (detalleSeleccionado == null) {
+            mostrarAlerta(Alert.AlertType.WARNING, "Selección requerida", "Por favor, selecciona el producto específico a devolver o cambiar de la tabla de desglose inferior.");
+            return;
+        }
+
+        if (detalleSeleccionado.cantidad() <= 0) {
+            mostrarAlerta(Alert.AlertType.WARNING, "Sin unidades", "Este producto ya fue devuelto en su totalidad (cantidad: 0).");
+            return;
+        }
+
+        // Crear Diálogo Modal para Devolución / Cambio
+        Dialog<Boolean> dialog = new Dialog<>();
+        dialog.setTitle("Procesar Devolución o Cambio");
+        dialog.setHeaderText("Factura: " + ventaSeleccionada.getNumeroVenta() +
+                "\nProducto: " + detalleSeleccionado.producto() +
+                "\nCantidad vendida: " + detalleSeleccionado.cantidad() + " | Precio Unitario: C$ " +
+                String.format(Locale.US, "%.2f", detalleSeleccionado.precioUnitario()));
+
+        ButtonType btnConfirmar = new ButtonType("Confirmar Transacción", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(btnConfirmar, ButtonType.CANCEL);
+
+        GridPane grid = new GridPane();
+        grid.setHgap(12);
+        grid.setVgap(12);
+        grid.setPadding(new Insets(20, 20, 10, 10));
+
+        // Selector de cantidad a devolver
+        Spinner<Integer> spnCantidad = new Spinner<>(1, detalleSeleccionado.cantidad(), 1);
+        spnCantidad.setEditable(true);
+        spnCantidad.setPrefWidth(120);
+
+        // Selector de Motivo / Tipo de acción
+        ComboBox<String> cmbTipoAccion = new ComboBox<>();
+        cmbTipoAccion.getItems().addAll(
+                "Recambio de producto (cambio por otro calzado)",
+                "Producto dañado (devolución sin ingresar al stock)",
+                "Devolución normal (devolución con reingreso al stock)"
+        );
+        cmbTipoAccion.setValue("Devolución normal (devolución con reingreso al stock)");
+        cmbTipoAccion.setMaxWidth(Double.MAX_VALUE);
+
+        // Controles para Recambio de producto
+        Label lblNuevoProd = new Label("Calzado de reemplazo *:");
+        ComboBox<InventarioDAO.OpcionRecambio> cmbNuevoCalzado = new ComboBox<>();
+        cmbNuevoCalzado.setMaxWidth(Double.MAX_VALUE);
+        cmbNuevoCalzado.setPromptText("Selecciona el nuevo producto del inventario...");
+
+        Label lblDiferencia = new Label("Diferencia financiera: C$ 0.00");
+        lblDiferencia.setStyle("-fx-font-weight: bold; -fx-text-fill: #0284c7;");
+
+        // Cargar inventario disponible para reemplazo
+        List<InventarioDAO.OpcionRecambio> disponibles = inventarioDAO.obtenerOpcionesRecambio();
+        cmbNuevoCalzado.setItems(FXCollections.observableArrayList(disponibles));
+
+        Runnable calcularDiferencia = () -> {
+            InventarioDAO.OpcionRecambio nuevo = cmbNuevoCalzado.getValue();
+            if (nuevo != null) {
+                double nuevoPrecio = nuevo.precio();
+                int cant = spnCantidad.getValue();
+                double diffSub = cant * (nuevoPrecio - detalleSeleccionado.precioUnitario());
+                double diffTot = diffSub * 1.15;
+                if (diffTot > 0) {
+                    lblDiferencia.setText(String.format(Locale.US, "Cobrar al cliente: C$ %.2f (Total)", diffTot));
+                    lblDiferencia.setStyle("-fx-font-weight: bold; -fx-text-fill: #16a34a;");
+                } else if (diffTot < 0) {
+                    lblDiferencia.setText(String.format(Locale.US, "Devolver al cliente: C$ %.2f (Total)", Math.abs(diffTot)));
+                    lblDiferencia.setStyle("-fx-font-weight: bold; -fx-text-fill: #dc2626;");
+                } else {
+                    lblDiferencia.setText("Mismo valor: C$ 0.00 (sin cobro ni devolución)");
+                    lblDiferencia.setStyle("-fx-font-weight: bold; -fx-text-fill: #0284c7;");
+                }
+            } else {
+                lblDiferencia.setText("Diferencia financiera: —");
+            }
+        };
+
+        cmbNuevoCalzado.valueProperty().addListener((o, v, n) -> calcularDiferencia.run());
+        spnCantidad.valueProperty().addListener((o, v, n) -> calcularDiferencia.run());
+
+        VBox boxRecambio = new VBox(6, lblNuevoProd, cmbNuevoCalzado, lblDiferencia);
+        boxRecambio.setVisible(false);
+        boxRecambio.setManaged(false);
+
+        cmbTipoAccion.valueProperty().addListener((obs, old, val) -> {
+            boolean esRecambio = val != null && val.startsWith("Recambio");
+            boxRecambio.setVisible(esRecambio);
+            boxRecambio.setManaged(esRecambio);
+        });
+
+        TextField txtMotivo = new TextField();
+        txtMotivo.setPromptText("Ej. Defecto de fábrica en costura / Talla incorrecta / Arrepentimiento");
+
+        grid.add(new Label("Cantidad a Procesar *:"), 0, 0);
+        grid.add(spnCantidad, 1, 0);
+        grid.add(new Label("Motivo / Acción *:"), 0, 1);
+        grid.add(cmbTipoAccion, 1, 1);
+        grid.add(boxRecambio, 0, 2, 2, 1);
+        grid.add(new Label("Notas / Explicación:"), 0, 3);
+        grid.add(txtMotivo, 1, 3);
+
+        dialog.getDialogPane().setContent(grid);
+
+        dialog.setResultConverter(button -> {
+            if (button == btnConfirmar) {
+                String accion = cmbTipoAccion.getValue();
+                int cantDev = spnCantidad.getValue();
+                String motivo = txtMotivo.getText() != null ? txtMotivo.getText().trim() : "";
+
+                VentaDAO.TipoDevolucion tipoEnum;
+                UUID nuevoInvId = null;
+                double nuevoPrecio = 0.0;
+
+                if (accion.startsWith("Recambio")) {
+                    tipoEnum = VentaDAO.TipoDevolucion.RECAMBIO;
+                    InventarioDAO.OpcionRecambio nuevo = cmbNuevoCalzado.getValue();
+                    if (nuevo == null) {
+                        mostrarAlerta(Alert.AlertType.WARNING, "Selección requerida", "Debes seleccionar el nuevo calzado para el recambio.");
+                        return false;
+                    }
+                    if (nuevo.stock() < cantDev) {
+                        mostrarAlerta(Alert.AlertType.WARNING, "Stock insuficiente", "No hay suficiente stock del nuevo calzado seleccionado (Disponible: " + nuevo.stock() + ").");
+                        return false;
+                    }
+                    nuevoInvId = nuevo.inventarioId();
+                    nuevoPrecio = nuevo.precio();
+                } else if (accion.contains("dañado")) {
+                    tipoEnum = VentaDAO.TipoDevolucion.PRODUCTO_DANADO;
+                } else {
+                    tipoEnum = VentaDAO.TipoDevolucion.DEVOLUCION_NORMAL;
+                }
+
+                boolean exito = ventaDAO.procesarDevolucionOCambio(
+                        ventaSeleccionada.getVenta_id(),
+                        detalleSeleccionado.detalleId(),
+                        cantDev,
+                        tipoEnum,
+                        nuevoInvId,
+                        nuevoPrecio,
+                        motivo
+                );
+
+                return exito;
+            }
+            return false;
+        });
+
+        Optional<Boolean> res = dialog.showAndWait();
+        if (res.orElse(false)) {
+            mostrarAlerta(Alert.AlertType.INFORMATION, "Éxito", "La devolución o cambio se procesó y guardó exitosamente en la base de datos.");
+            UUID idVenta = ventaSeleccionada.getVenta_id();
+            cargarDatos();
+            // Reseleccionar la venta actualizada
+            for (Venta v : listaVentas) {
+                if (v.getVenta_id().equals(idVenta)) {
+                    tablaVentas.getSelectionModel().select(v);
+                    mostrarDetallesVenta(v);
+                    break;
+                }
             }
         }
     }

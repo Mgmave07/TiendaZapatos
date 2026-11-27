@@ -47,6 +47,9 @@
             <Button fx:id="btnNavUsuarios" text="👥   Gestión de usuarios" onAction="#mostrarUsuarios" maxWidth="Infinity"
                     alignment="CENTER_LEFT"
                     style="-fx-background-color: transparent; -fx-text-fill: white; -fx-cursor: hand; -fx-padding: 12 16; -fx-font-size: 14px;"/>
+            <Button fx:id="btnNavClientes" text="👤   Gestión de clientes" onAction="#mostrarClientes" maxWidth="Infinity"
+                    alignment="CENTER_LEFT"
+                    style="-fx-background-color: transparent; -fx-text-fill: white; -fx-cursor: hand; -fx-padding: 12 16; -fx-font-size: 14px;"/>
             <Button fx:id="btnNavReportes" text="📄   Reportes" onAction="#mostrarReportes" maxWidth="Infinity"
                     alignment="CENTER_LEFT"
                     style="-fx-background-color: transparent; -fx-text-fill: white; -fx-cursor: hand; -fx-padding: 12 16; -fx-font-size: 14px;"/>
@@ -159,8 +162,19 @@
                                                     style="-fx-background-color: #7c3aed; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10; -fx-cursor: hand; -fx-background-radius: 6;"/>
                                         </VBox>
 
-                                        <!-- Tarjeta 5: Reportes PDF -->
-                                        <VBox spacing="14" GridPane.columnIndex="0" GridPane.rowIndex="2" GridPane.columnSpan="2"
+                                        <!-- Tarjeta 5: Gestión de Clientes -->
+                                        <VBox spacing="14" GridPane.columnIndex="0" GridPane.rowIndex="2"
+                                              style="-fx-background-color: white; -fx-padding: 22; -fx-background-radius: 12; -fx-border-color: #e3e9f0; -fx-border-radius: 12;">
+                                            <Label text="GESTIÓN DE CLIENTES"
+                                                   style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #203247;"/>
+                                            <Label text="Consultá clientes registrados, modificá su información y revisá sus compras históricas."
+                                                   wrapText="true" style="-fx-text-fill: #65758b; -fx-font-size: 13px;"/>
+                                            <Button text="Gestionar clientes" onAction="#mostrarClientes" maxWidth="Infinity"
+                                                    style="-fx-background-color: #0369a1; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10; -fx-cursor: hand; -fx-background-radius: 6;"/>
+                                        </VBox>
+
+                                        <!-- Tarjeta 6: Reportes PDF -->
+                                        <VBox spacing="14" GridPane.columnIndex="1" GridPane.rowIndex="2"
                                               style="-fx-background-color: white; -fx-padding: 22; -fx-background-radius: 12; -fx-border-color: #e3e9f0; -fx-border-radius: 12;">
                                             <Label text="REPORTES EN PDF"
                                                    style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #203247;"/>

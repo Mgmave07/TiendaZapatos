@@ -34,6 +34,7 @@ public class AdminViewController {
     @FXML private Button btnNavVentas;
     @FXML private Button btnNavHistorialVentas;
     @FXML private Button btnNavUsuarios;
+    @FXML private Button btnNavClientes;
     @FXML private Button btnNavReportes;
     @FXML private Button btnVolver;
     @FXML private Label lblRuta;
@@ -46,9 +47,10 @@ public class AdminViewController {
     private Parent vistaVentas;
     private Parent vistaHistorialVentas;
     private Parent vistaUsuarios;
+    private Parent vistaClientes;
     private Parent vistaReportes;
 
-    private enum Seccion { INICIO, INVENTARIO, VENTAS, HISTORIAL_VENTAS, USUARIOS, REPORTES }
+    private enum Seccion { INICIO, INVENTARIO, VENTAS, HISTORIAL_VENTAS, USUARIOS, CLIENTES, REPORTES }
     private Seccion seccionActual = Seccion.INICIO;
     private final Deque<Seccion> historial = new ArrayDeque<>();
 
@@ -113,6 +115,11 @@ public class AdminViewController {
     }
 
     @FXML
+    private void mostrarClientes() {
+        cambiarSeccion(Seccion.CLIENTES, true);
+    }
+
+    @FXML
     private void mostrarReportes() {
         cambiarSeccion(Seccion.REPORTES, true);
     }
@@ -173,6 +180,10 @@ public class AdminViewController {
                 if (vistaUsuarios == null) vistaUsuarios = cargarVista("GestionUsuariosView.fxml");
                 yield vistaUsuarios;
             }
+            case CLIENTES -> {
+                if (vistaClientes == null) vistaClientes = cargarVista("GestionClientesView.fxml");
+                yield vistaClientes;
+            }
             case REPORTES -> {
                 if (vistaReportes == null) vistaReportes = cargarVista("ReportesView.fxml");
                 yield vistaReportes;
@@ -187,6 +198,7 @@ public class AdminViewController {
             case VENTAS -> "Facturación";
             case HISTORIAL_VENTAS -> "Historial de ventas";
             case USUARIOS -> "Gestión de usuarios";
+            case CLIENTES -> "Gestión de clientes";
             case REPORTES -> "Reportes";
         };
     }
@@ -197,6 +209,7 @@ public class AdminViewController {
         marcarActivo(btnNavVentas, seccionActual == Seccion.VENTAS);
         marcarActivo(btnNavHistorialVentas, seccionActual == Seccion.HISTORIAL_VENTAS);
         marcarActivo(btnNavUsuarios, seccionActual == Seccion.USUARIOS);
+        marcarActivo(btnNavClientes, seccionActual == Seccion.CLIENTES);
         marcarActivo(btnNavReportes, seccionActual == Seccion.REPORTES);
 
         lblRuta.setText(nombreSeccion(seccionActual));

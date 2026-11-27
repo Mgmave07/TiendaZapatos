@@ -40,7 +40,7 @@
                     style="-fx-background-color: transparent; -fx-text-fill: #cbd5e1;
                            -fx-alignment: CENTER_LEFT; -fx-padding: 0 16; -fx-cursor: hand; -fx-background-radius: 7;"/>
 
-            <Button fx:id="btnNavBuscador" text="🔍   Buscador de Calzado" onAction="#handleNavBuscador"
+            <Button fx:id="btnNavBuscador" text="📦   Consulta de Artículos" onAction="#handleNavBuscador"
                     maxWidth="Infinity" prefHeight="42"
                     style="-fx-background-color: transparent; -fx-text-fill: #cbd5e1;
                            -fx-alignment: CENTER_LEFT; -fx-padding: 0 16; -fx-cursor: hand; -fx-background-radius: 7;"/>
@@ -141,17 +141,17 @@
                                                            -fx-padding: 10; -fx-cursor: hand; -fx-background-radius: 6; -fx-font-size: 13px;"/>
                                         </VBox>
 
-                                        <!-- Tarjeta 2: Buscador de Calzado -->
+                                        <!-- Tarjeta 2: Consulta de Artículos -->
                                         <VBox spacing="14" GridPane.columnIndex="1" GridPane.rowIndex="0"
                                               style="-fx-background-color: white; -fx-padding: 22; -fx-background-radius: 12;
                                                      -fx-border-color: #e2e8f0; -fx-border-radius: 12;
                                                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 8, 0, 0, 2);">
-                                            <Label text="🔍 BUSCADOR DE CALZADO"
+                                            <Label text="📦 CONSULTA DE ARTÍCULOS"
                                                    style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #0f172a;"/>
-                                            <Label text="Consultá rápidamente disponibilidad de modelos, marcas, tallas y colores para responder al cliente al instante."
+                                            <Label text="Explorá la base de datos de calzado completa con filtros por marca, modelo, stock y precio, y mirá los detalles de cada zapato."
                                                    wrapText="true" style="-fx-text-fill: #64748b; -fx-font-size: 13px;"/>
                                             <Region VBox.vgrow="ALWAYS"/>
-                                            <Button text="Buscar Productos" onAction="#handleNavBuscador" maxWidth="Infinity"
+                                            <Button text="Consultar Catálogo" onAction="#handleNavBuscador" maxWidth="Infinity"
                                                     style="-fx-background-color: #0284c7; -fx-text-fill: white; -fx-font-weight: bold;
                                                            -fx-padding: 10; -fx-cursor: hand; -fx-background-radius: 6; -fx-font-size: 13px;"/>
                                         </VBox>

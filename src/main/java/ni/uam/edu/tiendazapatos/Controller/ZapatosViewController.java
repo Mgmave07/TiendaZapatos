@@ -10,6 +10,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
@@ -30,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class ZapatosViewController {
@@ -57,6 +59,9 @@ public class ZapatosViewController {
 
     @FXML private Button btnVerDetalles;
     @FXML private Button btnEditar;
+    @FXML private Button btnToggleActivo;
+    @FXML private Button btnAgregarZapato;
+    @FXML private Button btnCerrarSesion;
 
     private final ZapatoDAO zapatoDAO = new ZapatoDAO();
     private final InventarioDAO inventarioDAO = new InventarioDAO();
@@ -83,6 +88,27 @@ public class ZapatosViewController {
         colEstado.setCellValueFactory(c -> texto(estado(c.getValue())));
 
         configurarFiltros();
+
+        // Control de permisos según rol de usuario
+        boolean esAdmin = SesionUsuario.getInstancia().estaAutenticado()
+                && SesionUsuario.getInstancia().esAdministrador();
+        if (!esAdmin) {
+            if (btnEditar != null) { btnEditar.setVisible(false); btnEditar.setManaged(false); }
+            if (btnToggleActivo != null) { btnToggleActivo.setVisible(false); btnToggleActivo.setManaged(false); }
+            if (btnAgregarZapato != null) { btnAgregarZapato.setVisible(false); btnAgregarZapato.setManaged(false); }
+        }
+        if (btnCerrarSesion != null) {
+            // El menú principal de la aplicación ya dispone de cierre de sesión
+            btnCerrarSesion.setVisible(false);
+            btnCerrarSesion.setManaged(false);
+        }
+
+        // Permitir ver detalles con doble clic en la tabla
+        tablaZapatos.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2 && tablaZapatos.getSelectionModel().getSelectedItem() != null) {
+                handleVerDetalles();
+            }
+        });
 
         SortedList<InventarioFila> ordenadas = new SortedList<>(filtradas);
         ordenadas.comparatorProperty().bind(tablaZapatos.comparatorProperty());
@@ -389,6 +415,39 @@ public class ZapatosViewController {
         } catch (IOException e) {
             e.printStackTrace();
             mostrarError("No se pudo abrir la edición", e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleToggleActivoZapato() {
+        InventarioFila seleccion = tablaZapatos.getSelectionModel().getSelectedItem();
+        if (seleccion == null) {
+            new Alert(Alert.AlertType.WARNING, "Por favor, selecciona un zapato de la tabla primero.").showAndWait();
+            return;
+        }
+
+        Zapato zapato = seleccion.zapato();
+        boolean estadoActual = Boolean.TRUE.equals(zapato.getActivo());
+        String accion = estadoActual ? "desactivar (marcar como no disponible)" : "activar (marcar como disponible)";
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirmar Acción");
+        confirm.setHeaderText("¿Estás seguro de que deseas " + accion + " el modelo '" + zapato.getNombre() + "'?");
+        confirm.setContentText(estadoActual
+                ? "Al desactivarlo, no estará disponible para venta ni aparecerá en el punto de venta para los vendedores, pero se conservará su historial de ventas pasadas."
+                : "Al activarlo, volverá a estar disponible en el inventario para la venta.");
+
+        Optional<ButtonType> res = confirm.showAndWait();
+        if (res.isPresent() && res.get() == ButtonType.OK) {
+            try {
+                zapato.setActivo(!estadoActual);
+                zapatoDAO.actualizar(zapato);
+                new Alert(Alert.AlertType.INFORMATION, "El calzado ha sido " + (!estadoActual ? "activado" : "desactivado") + " correctamente.").showAndWait();
+                cargarZapatos();
+            } catch (Exception e) {
+                e.printStackTrace();
+                mostrarError("Error al cambiar estado", e.getMessage());
+            }
         }
     }
 }

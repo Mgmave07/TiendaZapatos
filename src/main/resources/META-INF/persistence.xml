@@ -8,6 +8,7 @@
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 
         <!-- Clases Entidad del proyecto -->
+        <class>ni.uam.edu.tiendazapatos.modelo.Cliente</class>
         <class>ni.uam.edu.tiendazapatos.modelo.DetalleVenta</class>
         <class>ni.uam.edu.tiendazapatos.modelo.InventarioFila</class>
         <class>ni.uam.edu.tiendazapatos.modelo.Marca</class>

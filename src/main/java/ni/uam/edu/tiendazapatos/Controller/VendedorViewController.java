@@ -138,8 +138,8 @@ public class VendedorViewController {
     private Node cargarVista(Seccion seccion) {
         String fxml = switch (seccion) {
             case INICIO -> null;
-            case PUNTO_VENTA -> "PuntoDeVentaView.fxml";
-            case BUSCADOR -> "BuscadorCalzadoView.fxml";
+            case PUNTO_VENTA -> "VentasView.fxml";
+            case BUSCADOR -> "ZapatosView.fxml";
             case MIS_VENTAS -> "MisVentasView.fxml";
         };
 
@@ -178,8 +178,8 @@ public class VendedorViewController {
     private String nombreSeccion(Seccion seccion) {
         return switch (seccion) {
             case INICIO -> "Inicio";
-            case PUNTO_VENTA -> "Punto de Venta";
-            case BUSCADOR -> "Buscador de Calzado";
+            case PUNTO_VENTA -> "Punto de Venta / Facturación";
+            case BUSCADOR -> "Consulta de Artículos (Inventario)";
             case MIS_VENTAS -> "Mis Ventas del Día";
         };
     }

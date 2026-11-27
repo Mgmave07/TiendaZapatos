@@ -8,7 +8,10 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.Stage;
 import ni.uam.edu.tiendazapatos.dao.InventarioDAO;
 import ni.uam.edu.tiendazapatos.dao.MarcaDAO;
 import ni.uam.edu.tiendazapatos.dao.VentaDAO;
@@ -19,6 +22,7 @@ import ni.uam.edu.tiendazapatos.modelo.Marca;
 import ni.uam.edu.tiendazapatos.modelo.Venta;
 import ni.uam.edu.tiendazapatos.modelo.Zapato;
 
+import java.io.IOException;
 import java.util.*;
 
 public class VentasViewController {
@@ -51,6 +55,7 @@ public class VentasViewController {
 
     // Controles de Selección y Carrito
     @FXML private Label lblProductoSeleccionado;
+    @FXML private Button btnVerDetalles;
     @FXML private TextField txtCantidad;
     @FXML private Label lblItemsCount;
 
@@ -354,6 +359,28 @@ public class VentasViewController {
     @FXML
     private void handleActualizar() {
         cargarProductos();
+    }
+
+    @FXML
+    private void handleVerDetalles() {
+        InventarioFila seleccion = tablaProductos.getSelectionModel().getSelectedItem();
+        if (seleccion == null) {
+            mostrarAlerta(Alert.AlertType.WARNING, "Aviso", "Por favor, seleccione un producto de la tabla primero.");
+            return;
+        }
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ni/uam/edu/tiendazapatos/DetalleZapato.fxml"));
+            Scene scene = new Scene(loader.load(), 500, 600);
+            DetalleZapatoController controller = loader.getController();
+            controller.setZapato(seleccion.zapato(), seleccion.genero(), seleccion.color());
+            Stage stage = new Stage();
+            stage.setTitle("Detalles del Zapato - " + seleccion.zapato().getNombre());
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            mostrarAlerta(Alert.AlertType.ERROR, "Error", "No se pudieron abrir los detalles del calzado: " + e.getMessage());
+        }
     }
 
     @FXML
