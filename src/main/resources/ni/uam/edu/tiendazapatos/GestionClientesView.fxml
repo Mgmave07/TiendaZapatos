@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="14.0" prefWidth="1100.0" prefHeight="700.0"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="ni.uam.edu.tiendazapatos.Controller.GestionClientesController"
+      style="-fx-background-color: #f8fafc;">
+    <padding>
+        <Insets top="18.0" bottom="18.0" left="22.0" right="22.0"/>
+    </padding>
+
+    <!-- Encabezado con KPIs -->
+    <HBox alignment="CENTER_LEFT" spacing="15">
+        <VBox spacing="2">
+            <Label text="Gestión de Clientes"
+                   style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1e293b;"/>
+            <Label text="Consulta y modificación de datos de clientes, historial de compras y auditoría"
+                   style="-fx-font-size: 13px; -fx-text-fill: #64748b;"/>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+
+        <!-- Mini tarjetas KPI -->
+        <HBox spacing="12">
+            <VBox alignment="CENTER_RIGHT" style="-fx-background-color: white; -fx-padding: 8 16; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+                <Label text="TOTAL CLIENTES" style="-fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: #64748b;"/>
+                <Label fx:id="lblKpiTotalClientes" text="0 registrados" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #0284c7;"/>
+            </VBox>
+            <VBox alignment="CENTER_RIGHT" style="-fx-background-color: white; -fx-padding: 8 16; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+                <Label text="CLIENTES ACTIVOS" style="-fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: #64748b;"/>
+                <Label fx:id="lblKpiClientesActivos" text="0 activos" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #16a34a;"/>
+            </VBox>
+        </HBox>
+    </HBox>
+
+    <!-- Barra de Búsqueda y Acciones -->
+    <HBox spacing="12" alignment="CENTER_LEFT"
+          style="-fx-background-color: white; -fx-padding: 12 16; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+        <Label text="Buscar:" style="-fx-font-weight: bold; -fx-text-fill: #334155;"/>
+        <TextField fx:id="txtBuscar" promptText="Buscar por nombre, cédula o teléfono..."
+                   HBox.hgrow="ALWAYS" style="-fx-padding: 7 10;"/>
+
+        <Label text="Estado:" style="-fx-font-weight: bold; -fx-text-fill: #334155;"/>
+        <ComboBox fx:id="cmbEstado" prefWidth="130"/>
+
+        <Button text="Limpiar" onAction="#handleLimpiarFiltro"
+                style="-fx-background-color: #64748b; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 5; -fx-padding: 7 14;"/>
+        <Button text="Actualizar" onAction="#handleActualizar"
+                style="-fx-background-color: #e2e8f0; -fx-text-fill: #1e293b; -fx-cursor: hand; -fx-font-weight: bold; -fx-background-radius: 5; -fx-padding: 7 14;"/>
+        <Button text="➕ Nuevo Cliente" onAction="#handleNuevoCliente"
+                style="-fx-background-color: #0284c7; -fx-text-fill: white; -fx-cursor: hand; -fx-font-weight: bold; -fx-background-radius: 5; -fx-padding: 7 16;"/>
+    </HBox>
+
+    <!-- SplitPane: Lista de Clientes (Superior) y Estadísticas/Facturas (Inferior) -->
+    <SplitPane orientation="VERTICAL" dividerPositions="0.55" VBox.vgrow="ALWAYS"
+               style="-fx-background-color: transparent; -fx-box-border: transparent;">
+
+        <!-- Panel Superior: Tabla de Clientes -->
+        <VBox spacing="8" style="-fx-background-color: white; -fx-padding: 12; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label text="Clientes Registrados" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #334155;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="✏ Modificar Información" onAction="#handleEditarCliente"
+                        style="-fx-background-color: #f1f5f9; -fx-border-color: #cbd5e1; -fx-border-radius: 5; -fx-text-fill: #0f172a; -fx-cursor: hand; -fx-font-weight: bold; -fx-padding: 5 12;"/>
+                <Button text="🚫 Activar / Desactivar" onAction="#handleToggleActivo"
+                        style="-fx-background-color: #f1f5f9; -fx-border-color: #cbd5e1; -fx-border-radius: 5; -fx-text-fill: #475569; -fx-cursor: hand; -fx-padding: 5 12;"/>
+            </HBox>
+
+            <TableView fx:id="tablaClientes" VBox.vgrow="ALWAYS" prefHeight="220">
+                <columns>
+                    <TableColumn fx:id="colNombre" text="Nombre Completo" prefWidth="200"/>
+                    <TableColumn fx:id="colIdentificacion" text="Identificación / Cédula" prefWidth="150"/>
+                    <TableColumn fx:id="colTelefono" text="Teléfono" prefWidth="120"/>
+                    <TableColumn fx:id="colCorreo" text="Correo Electrónico" prefWidth="180"/>
+                    <TableColumn fx:id="colDireccion" text="Dirección" prefWidth="220"/>
+                    <TableColumn fx:id="colEstado" text="Estado" prefWidth="90"/>
+                    <TableColumn fx:id="colFechaRegistro" text="Registrado El" prefWidth="130"/>
+                </columns>
+                <placeholder>
+                    <Label text="No hay clientes que coincidan con la búsqueda."/>
+                </placeholder>
+            </TableView>
+        </VBox>
+
+        <!-- Panel Inferior: Resumen de Compras (Solo Lectura) e Historial de Facturas -->
+        <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 12; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;">
+            <HBox alignment="CENTER_LEFT" spacing="12">
+                <Label text="Historial de Facturas del Cliente" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #334155;"/>
+                <Label fx:id="lblClienteSeleccionado" text="(Selecciona un cliente arriba para ver sus compras)"
+                       style="-fx-font-size: 13px; -fx-text-fill: #0284c7; -fx-font-weight: bold;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <!-- Indicadores de solo lectura -->
+                <HBox spacing="10" style="-fx-background-color: #f8fafc; -fx-padding: 5 12; -fx-background-radius: 6; -fx-border-color: #e2e8f0; -fx-border-radius: 6;">
+                    <Label text="Facturas:" style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
+                    <Label fx:id="lblResumenFacturas" text="0" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #0f172a;"/>
+                    <Separator orientation="VERTICAL"/>
+                    <Label text="Artículos:" style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
+                    <Label fx:id="lblResumenArticulos" text="0" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #0f172a;"/>
+                    <Separator orientation="VERTICAL"/>
+                    <Label text="Total Invertido:" style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
+                    <Label fx:id="lblResumenTotal" text="C$ 0.00" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #16a34a;"/>
+                </HBox>
+            </HBox>
+
+            <!-- Tabla pequeña de facturas del cliente -->
+            <TableView fx:id="tablaFacturasCliente" VBox.vgrow="ALWAYS" prefHeight="160">
+                <columns>
+                    <TableColumn fx:id="colFacturaNumero" text="N° Factura" prefWidth="180"/>
+                    <TableColumn fx:id="colFacturaFecha" text="Fecha y Hora" prefWidth="170"/>
+                    <TableColumn fx:id="colFacturaMetodo" text="Método Pago" prefWidth="130"/>
+                    <TableColumn fx:id="colFacturaTotal" text="Total Facturado" prefWidth="140"/>
+                    <TableColumn fx:id="colFacturaEstado" text="Estado" prefWidth="110"/>
+                    <TableColumn fx:id="colFacturaArticulos" text="Cant. Productos" prefWidth="120"/>
+                </columns>
+                <placeholder>
+                    <Label text="No hay facturas registradas para el cliente seleccionado."/>
+                </placeholder>
+            </TableView>
+        </VBox>
+    </SplitPane>
+</VBox>

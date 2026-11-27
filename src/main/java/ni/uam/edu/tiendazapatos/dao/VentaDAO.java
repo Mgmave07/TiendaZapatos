@@ -186,30 +186,56 @@ public class VentaDAO {
                 // 2. Reduce volumen de ventas
                 em.createNativeQuery(
                         "UPDATE public.zapatos SET volumen_ventas = GREATEST(0, COALESCE(volumen_ventas, 0) - ?1) " +
-                        "WHERE zapato_id = (SELECT z2.zapato_id FROM public.inventario i2 JOIN public.zapatos z2 ON i2.zapato_id = z2.zapato_id WHERE i2.inventario_id = CAST(?2 AS uuid))")
+                        "WHERE zapato_id = (SELECT zapato_id FROM public.inventario WHERE inventario_id = CAST(?2 AS uuid) LIMIT 1)")
                         .setParameter(1, cantidadDevolver)
                         .setParameter(2, inventarioOriginalId.toString())
                         .executeUpdate();
 
-                // 3. Reembolso financiero (subtotal, impuesto, total)
-                double subtotalDevuelto = cantidadDevolver * precioOriginal;
-                double impuestoDevuelto = subtotalDevuelto * 0.15;
-                double totalDevuelto    = subtotalDevuelto + impuestoDevuelto;
-
+                // 3. Ajuste de ítems en la factura
                 int nuevaCant = detalle.getCantidad() - cantidadDevolver;
-                detalle.setCantidad(nuevaCant);
-                detalle.setSubtotal(nuevaCant * precioOriginal);
+                if (nuevaCant <= 0) {
+                    em.createNativeQuery("DELETE FROM public.detalles_venta WHERE detalle_id = CAST(?1 AS uuid)")
+                            .setParameter(1, detalle.getDetalle_id().toString())
+                            .executeUpdate();
+                    venta.getDetalles().remove(detalle);
+                } else {
+                    double nuevoSub = nuevaCant * precioOriginal;
+                    em.createNativeQuery("UPDATE public.detalles_venta SET cantidad = ?1, subtotal = ?2 WHERE detalle_id = CAST(?3 AS uuid)")
+                            .setParameter(1, nuevaCant)
+                            .setParameter(2, nuevoSub)
+                            .setParameter(3, detalle.getDetalle_id().toString())
+                            .executeUpdate();
+                    detalle.setCantidad(nuevaCant);
+                    detalle.setSubtotal(nuevoSub);
+                }
 
-                venta.setSubtotal(Math.max(0.0, venta.getSubtotal() - subtotalDevuelto));
-                venta.setImpuesto(Math.max(0.0, venta.getImpuesto() - impuestoDevuelto));
-                venta.setTotal(Math.max(0.0, venta.getTotal() - totalDevuelto));
+                // 4. Recalcular totales exactos de la factura
+                double subtotalFinal = 0.0;
+                for (DetalleVenta d : venta.getDetalles()) {
+                    subtotalFinal += d.getSubtotal();
+                }
+                double impuestoFinal = Math.round(subtotalFinal * 0.15 * 100.0) / 100.0;
+                double totalFinal = subtotalFinal + impuestoFinal;
 
-                boolean todosEnCero = venta.getDetalles().stream().allMatch(d -> d.getCantidad() <= 0);
-                venta.setEstado(todosEnCero ? "DEVUELTA" : "PARCIALMENTE_DEVUELTA");
-
+                String nuevoEstado = venta.getDetalles().isEmpty() ? "DEVUELTA" : "PAGADA";
                 String notaActual = venta.getNotas() != null ? venta.getNotas() : "";
-                String nuevaNota = String.format(Locale.US, " [Devolución por DAÑO: %d unidad(es), C$ %.2f reembolsado. Motivo: %s]",
-                        cantidadDevolver, totalDevuelto, motivoTexto);
+                String nuevaNota = String.format(Locale.US, " [Devolución por DAÑO: %d unidad(es). Reembolso total: C$ %.2f. Motivo: %s]",
+                        cantidadDevolver, (cantidadDevolver * precioOriginal * 1.15), motivoTexto);
+
+                em.createNativeQuery(
+                        "UPDATE public.ventas SET subtotal = ?1, impuesto = ?2, total = ?3, estado = ?4, notas = ?5 WHERE venta_id = CAST(?6 AS uuid)")
+                        .setParameter(1, subtotalFinal)
+                        .setParameter(2, impuestoFinal)
+                        .setParameter(3, totalFinal)
+                        .setParameter(4, nuevoEstado)
+                        .setParameter(5, notaActual + nuevaNota)
+                        .setParameter(6, venta.getVenta_id().toString())
+                        .executeUpdate();
+
+                venta.setSubtotal(subtotalFinal);
+                venta.setImpuesto(impuestoFinal);
+                venta.setTotal(totalFinal);
+                venta.setEstado(nuevoEstado);
                 venta.setNotas(notaActual + nuevaNota);
 
             } else if (tipo == TipoDevolucion.DEVOLUCION_NORMAL) {
@@ -223,30 +249,56 @@ public class VentaDAO {
                 // 2. Reduce volumen de ventas
                 em.createNativeQuery(
                         "UPDATE public.zapatos SET volumen_ventas = GREATEST(0, COALESCE(volumen_ventas, 0) - ?1) " +
-                        "WHERE zapato_id = (SELECT z2.zapato_id FROM public.inventario i2 JOIN public.zapatos z2 ON i2.zapato_id = z2.zapato_id WHERE i2.inventario_id = CAST(?2 AS uuid))")
+                        "WHERE zapato_id = (SELECT zapato_id FROM public.inventario WHERE inventario_id = CAST(?2 AS uuid) LIMIT 1)")
                         .setParameter(1, cantidadDevolver)
                         .setParameter(2, inventarioOriginalId.toString())
                         .executeUpdate();
 
-                // 3. Reembolso financiero
-                double subtotalDevuelto = cantidadDevolver * precioOriginal;
-                double impuestoDevuelto = subtotalDevuelto * 0.15;
-                double totalDevuelto    = subtotalDevuelto + impuestoDevuelto;
-
+                // 3. Ajuste de ítems en la factura
                 int nuevaCant = detalle.getCantidad() - cantidadDevolver;
-                detalle.setCantidad(nuevaCant);
-                detalle.setSubtotal(nuevaCant * precioOriginal);
+                if (nuevaCant <= 0) {
+                    em.createNativeQuery("DELETE FROM public.detalles_venta WHERE detalle_id = CAST(?1 AS uuid)")
+                            .setParameter(1, detalle.getDetalle_id().toString())
+                            .executeUpdate();
+                    venta.getDetalles().remove(detalle);
+                } else {
+                    double nuevoSub = nuevaCant * precioOriginal;
+                    em.createNativeQuery("UPDATE public.detalles_venta SET cantidad = ?1, subtotal = ?2 WHERE detalle_id = CAST(?3 AS uuid)")
+                            .setParameter(1, nuevaCant)
+                            .setParameter(2, nuevoSub)
+                            .setParameter(3, detalle.getDetalle_id().toString())
+                            .executeUpdate();
+                    detalle.setCantidad(nuevaCant);
+                    detalle.setSubtotal(nuevoSub);
+                }
 
-                venta.setSubtotal(Math.max(0.0, venta.getSubtotal() - subtotalDevuelto));
-                venta.setImpuesto(Math.max(0.0, venta.getImpuesto() - impuestoDevuelto));
-                venta.setTotal(Math.max(0.0, venta.getTotal() - totalDevuelto));
+                // 4. Recalcular totales exactos de la factura
+                double subtotalFinal = 0.0;
+                for (DetalleVenta d : venta.getDetalles()) {
+                    subtotalFinal += d.getSubtotal();
+                }
+                double impuestoFinal = Math.round(subtotalFinal * 0.15 * 100.0) / 100.0;
+                double totalFinal = subtotalFinal + impuestoFinal;
 
-                boolean todosEnCero = venta.getDetalles().stream().allMatch(d -> d.getCantidad() <= 0);
-                venta.setEstado(todosEnCero ? "DEVUELTA" : "PARCIALMENTE_DEVUELTA");
-
+                String nuevoEstado = venta.getDetalles().isEmpty() ? "DEVUELTA" : "PAGADA";
                 String notaActual = venta.getNotas() != null ? venta.getNotas() : "";
-                String nuevaNota = String.format(Locale.US, " [Devolución NORMAL: %d unidad(es) reincorporadas al stock, C$ %.2f reembolsado. Motivo: %s]",
-                        cantidadDevolver, totalDevuelto, motivoTexto);
+                String nuevaNota = String.format(Locale.US, " [Devolución NORMAL: %d unidad(es) reincorporadas al stock. Reembolso total: C$ %.2f. Motivo: %s]",
+                        cantidadDevolver, (cantidadDevolver * precioOriginal * 1.15), motivoTexto);
+
+                em.createNativeQuery(
+                        "UPDATE public.ventas SET subtotal = ?1, impuesto = ?2, total = ?3, estado = ?4, notas = ?5 WHERE venta_id = CAST(?6 AS uuid)")
+                        .setParameter(1, subtotalFinal)
+                        .setParameter(2, impuestoFinal)
+                        .setParameter(3, totalFinal)
+                        .setParameter(4, nuevoEstado)
+                        .setParameter(5, notaActual + nuevaNota)
+                        .setParameter(6, venta.getVenta_id().toString())
+                        .executeUpdate();
+
+                venta.setSubtotal(subtotalFinal);
+                venta.setImpuesto(impuestoFinal);
+                venta.setTotal(totalFinal);
+                venta.setEstado(nuevoEstado);
                 venta.setNotas(notaActual + nuevaNota);
 
             } else if (tipo == TipoDevolucion.RECAMBIO) {
@@ -272,53 +324,96 @@ public class VentaDAO {
                 // 3. Ajuste de volumen de ventas (viejo -, nuevo +)
                 em.createNativeQuery(
                         "UPDATE public.zapatos SET volumen_ventas = GREATEST(0, COALESCE(volumen_ventas, 0) - ?1) " +
-                        "WHERE zapato_id = (SELECT z2.zapato_id FROM public.inventario i2 JOIN public.zapatos z2 ON i2.zapato_id = z2.zapato_id WHERE i2.inventario_id = CAST(?2 AS uuid))")
+                        "WHERE zapato_id = (SELECT zapato_id FROM public.inventario WHERE inventario_id = CAST(?2 AS uuid) LIMIT 1)")
                         .setParameter(1, cantidadDevolver)
                         .setParameter(2, inventarioOriginalId.toString())
                         .executeUpdate();
 
                 em.createNativeQuery(
                         "UPDATE public.zapatos SET volumen_ventas = COALESCE(volumen_ventas, 0) + ?1 " +
-                        "WHERE zapato_id = (SELECT z2.zapato_id FROM public.inventario i2 JOIN public.zapatos z2 ON i2.zapato_id = z2.zapato_id WHERE i2.inventario_id = CAST(?2 AS uuid))")
+                        "WHERE zapato_id = (SELECT zapato_id FROM public.inventario WHERE inventario_id = CAST(?2 AS uuid) LIMIT 1)")
                         .setParameter(1, cantidadDevolver)
                         .setParameter(2, nuevoInventarioId.toString())
                         .executeUpdate();
 
-                // 4. Ajuste financiero por diferencia de precio
-                double diffSubtotal = cantidadDevolver * (nuevoPrecioUnitario - precioOriginal);
-                double diffImpuesto = diffSubtotal * 0.15;
-                double diffTotal    = diffSubtotal + diffImpuesto;
-
+                // 4. Modificar o añadir ítem en la factura
                 if (cantidadDevolver == detalle.getCantidad()) {
+                    double nuevoSubtotal = cantidadDevolver * nuevoPrecioUnitario;
+                    em.createNativeQuery(
+                            "UPDATE public.detalles_venta SET inventario_id = CAST(?1 AS uuid), precio_unitario = ?2, subtotal = ?3 WHERE detalle_id = CAST(?4 AS uuid)")
+                            .setParameter(1, nuevoInventarioId.toString())
+                            .setParameter(2, nuevoPrecioUnitario)
+                            .setParameter(3, nuevoSubtotal)
+                            .setParameter(4, detalle.getDetalle_id().toString())
+                            .executeUpdate();
+
                     detalle.setInventarioId(nuevoInventarioId);
                     detalle.setPrecioUnitario(nuevoPrecioUnitario);
-                    detalle.setSubtotal(cantidadDevolver * nuevoPrecioUnitario);
+                    detalle.setSubtotal(nuevoSubtotal);
                 } else {
                     int restante = detalle.getCantidad() - cantidadDevolver;
+                    double subtotalRestante = restante * precioOriginal;
+                    em.createNativeQuery(
+                            "UPDATE public.detalles_venta SET cantidad = ?1, subtotal = ?2 WHERE detalle_id = CAST(?3 AS uuid)")
+                            .setParameter(1, restante)
+                            .setParameter(2, subtotalRestante)
+                            .setParameter(3, detalle.getDetalle_id().toString())
+                            .executeUpdate();
+
                     detalle.setCantidad(restante);
-                    detalle.setSubtotal(restante * precioOriginal);
+                    detalle.setSubtotal(subtotalRestante);
+
+                    UUID nuevoDetalleId = UUID.randomUUID();
+                    double subtotalNuevoItem = cantidadDevolver * nuevoPrecioUnitario;
+                    em.createNativeQuery(
+                            "INSERT INTO public.detalles_venta (detalle_id, venta_id, inventario_id, cantidad, precio_unitario, subtotal) " +
+                            "VALUES (CAST(?1 AS uuid), CAST(?2 AS uuid), CAST(?3 AS uuid), ?4, ?5, ?6)")
+                            .setParameter(1, nuevoDetalleId.toString())
+                            .setParameter(2, venta.getVenta_id().toString())
+                            .setParameter(3, nuevoInventarioId.toString())
+                            .setParameter(4, cantidadDevolver)
+                            .setParameter(5, nuevoPrecioUnitario)
+                            .setParameter(6, subtotalNuevoItem)
+                            .executeUpdate();
 
                     DetalleVenta nuevoDet = new DetalleVenta();
+                    nuevoDet.setDetalle_id(nuevoDetalleId);
                     nuevoDet.setVenta(venta);
                     nuevoDet.setInventarioId(nuevoInventarioId);
                     nuevoDet.setCantidad(cantidadDevolver);
                     nuevoDet.setPrecioUnitario(nuevoPrecioUnitario);
-                    nuevoDet.setSubtotal(cantidadDevolver * nuevoPrecioUnitario);
-                    em.persist(nuevoDet);
+                    nuevoDet.setSubtotal(subtotalNuevoItem);
                     venta.getDetalles().add(nuevoDet);
                 }
 
-                venta.setSubtotal(Math.max(0.0, venta.getSubtotal() + diffSubtotal));
-                venta.setImpuesto(Math.max(0.0, venta.getImpuesto() + diffImpuesto));
-                venta.setTotal(Math.max(0.0, venta.getTotal() + diffTotal));
+                // 5. Recalcular totales de la factura
+                double subtotalFinal = 0.0;
+                for (DetalleVenta d : venta.getDetalles()) {
+                    subtotalFinal += d.getSubtotal();
+                }
+                double impuestoFinal = Math.round(subtotalFinal * 0.15 * 100.0) / 100.0;
+                double totalFinal = subtotalFinal + impuestoFinal;
 
+                double diffTotal = (cantidadDevolver * (nuevoPrecioUnitario - precioOriginal)) * 1.15;
                 String notaActual = venta.getNotas() != null ? venta.getNotas() : "";
-                String nuevaNota = String.format(Locale.US, " [Recambio de producto: %d unidad(es) cambiadas (Dif. C$ %.2f). Motivo: %s]",
+                String nuevaNota = String.format(Locale.US, " [Recambio de producto: %d unidad(es) cambiadas (Diferencia: C$ %.2f). Motivo: %s]",
                         cantidadDevolver, diffTotal, motivoTexto);
+
+                em.createNativeQuery(
+                        "UPDATE public.ventas SET subtotal = ?1, impuesto = ?2, total = ?3, notas = ?4 WHERE venta_id = CAST(?5 AS uuid)")
+                        .setParameter(1, subtotalFinal)
+                        .setParameter(2, impuestoFinal)
+                        .setParameter(3, totalFinal)
+                        .setParameter(4, notaActual + nuevaNota)
+                        .setParameter(5, venta.getVenta_id().toString())
+                        .executeUpdate();
+
+                venta.setSubtotal(subtotalFinal);
+                venta.setImpuesto(impuestoFinal);
+                venta.setTotal(totalFinal);
                 venta.setNotas(notaActual + nuevaNota);
             }
 
-            em.merge(venta);
             em.getTransaction().commit();
             return true;
 

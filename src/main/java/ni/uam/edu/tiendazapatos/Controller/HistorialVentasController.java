@@ -153,7 +153,7 @@ public class HistorialVentasController {
         cmbMetodoPago.getItems().setAll("Todos los métodos", "Efectivo", "Tarjeta", "Transferencia");
         cmbMetodoPago.getSelectionModel().selectFirst();
 
-        cmbEstadoVenta.getItems().setAll("Todos los estados", "PAGADA", "PARCIALMENTE_DEVUELTA", "DEVUELTA", "CANCELADA");
+        cmbEstadoVenta.getItems().setAll("Todos los estados", "PAGADA", "DEVUELTA", "CANCELADA");
         cmbEstadoVenta.getSelectionModel().selectFirst();
 
         txtBuscarFactura.textProperty().addListener((obs, ant, nuevo) -> aplicarFiltros());
@@ -292,45 +292,103 @@ public class HistorialVentasController {
         cmbTipoAccion.setValue("Devolución normal (devolución con reingreso al stock)");
         cmbTipoAccion.setMaxWidth(Double.MAX_VALUE);
 
-        // Controles para Recambio de producto
-        Label lblNuevoProd = new Label("Calzado de reemplazo *:");
-        ComboBox<InventarioDAO.OpcionRecambio> cmbNuevoCalzado = new ComboBox<>();
-        cmbNuevoCalzado.setMaxWidth(Double.MAX_VALUE);
-        cmbNuevoCalzado.setPromptText("Selecciona el nuevo producto del inventario...");
+        // Controles para Recambio de producto con buscador y TableView
+        Label lblNuevoProd = new Label("Buscar y seleccionar calzado de reemplazo del catálogo *:");
+        lblNuevoProd.setStyle("-fx-font-weight: bold; -fx-text-fill: #1e293b;");
 
-        Label lblDiferencia = new Label("Diferencia financiera: C$ 0.00");
-        lblDiferencia.setStyle("-fx-font-weight: bold; -fx-text-fill: #0284c7;");
+        TextField txtBuscarRecambio = new TextField();
+        txtBuscarRecambio.setPromptText("🔍 Escriba modelo, marca, talla o color para filtrar en tiempo real...");
+        txtBuscarRecambio.setStyle("-fx-padding: 7 10; -fx-background-radius: 6; -fx-border-color: #cbd5e1; -fx-border-radius: 6;");
 
-        // Cargar inventario disponible para reemplazo
+        TableView<InventarioDAO.OpcionRecambio> tablaRecambio = new TableView<>();
+        tablaRecambio.setPrefHeight(180);
+        tablaRecambio.setMaxHeight(200);
+
+        TableColumn<InventarioDAO.OpcionRecambio, String> colRecModelo = new TableColumn<>("Modelo");
+        colRecModelo.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().nombre()));
+        colRecModelo.setPrefWidth(160);
+
+        TableColumn<InventarioDAO.OpcionRecambio, String> colRecMarca = new TableColumn<>("Marca");
+        colRecMarca.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().marca()));
+        colRecMarca.setPrefWidth(100);
+
+        TableColumn<InventarioDAO.OpcionRecambio, String> colRecTalla = new TableColumn<>("Talla");
+        colRecTalla.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().talla()));
+        colRecTalla.setPrefWidth(60);
+
+        TableColumn<InventarioDAO.OpcionRecambio, String> colRecColor = new TableColumn<>("Color");
+        colRecColor.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().color()));
+        colRecColor.setPrefWidth(110);
+
+        TableColumn<InventarioDAO.OpcionRecambio, Number> colRecStock = new TableColumn<>("Stock");
+        colRecStock.setCellValueFactory(c -> new SimpleIntegerProperty(c.getValue().stock()));
+        colRecStock.setPrefWidth(65);
+
+        TableColumn<InventarioDAO.OpcionRecambio, String> colRecPrecio = new TableColumn<>("Precio");
+        colRecPrecio.setCellValueFactory(c -> new SimpleStringProperty(String.format(Locale.US, "C$ %.2f", c.getValue().precio())));
+        colRecPrecio.setPrefWidth(95);
+
+        tablaRecambio.getColumns().addAll(colRecModelo, colRecMarca, colRecTalla, colRecColor, colRecStock, colRecPrecio);
+
+        // Cargar inventario disponible para reemplazo y configurar filtro reactivo
         List<InventarioDAO.OpcionRecambio> disponibles = inventarioDAO.obtenerOpcionesRecambio();
-        cmbNuevoCalzado.setItems(FXCollections.observableArrayList(disponibles));
+        ObservableList<InventarioDAO.OpcionRecambio> listaRecambio = FXCollections.observableArrayList(disponibles);
+        FilteredList<InventarioDAO.OpcionRecambio> filtradasRecambio = new FilteredList<>(listaRecambio, p -> true);
+
+        txtBuscarRecambio.textProperty().addListener((obs, ant, nuevo) -> {
+            String filtro = nuevo == null ? "" : nuevo.trim().toLowerCase(Locale.ROOT);
+            filtradasRecambio.setPredicate(item -> {
+                if (filtro.isEmpty()) return true;
+                return (item.nombre() != null && item.nombre().toLowerCase(Locale.ROOT).contains(filtro))
+                        || (item.marca() != null && item.marca().toLowerCase(Locale.ROOT).contains(filtro))
+                        || (item.talla() != null && item.talla().toLowerCase(Locale.ROOT).contains(filtro))
+                        || (item.color() != null && item.color().toLowerCase(Locale.ROOT).contains(filtro));
+            });
+        });
+
+        SortedList<InventarioDAO.OpcionRecambio> ordenadasRecambio = new SortedList<>(filtradasRecambio);
+        ordenadasRecambio.comparatorProperty().bind(tablaRecambio.comparatorProperty());
+        tablaRecambio.setItems(ordenadasRecambio);
+
+        Label lblSeleccionado = new Label("Ningún calzado seleccionado aún. Haga clic en una fila de la tabla.");
+        lblSeleccionado.setStyle("-fx-font-size: 12px; -fx-text-fill: #475569; -fx-font-style: italic;");
+
+        Label lblDiferencia = new Label("Diferencia financiera: —");
+        lblDiferencia.setStyle("-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #0284c7;");
 
         Runnable calcularDiferencia = () -> {
-            InventarioDAO.OpcionRecambio nuevo = cmbNuevoCalzado.getValue();
+            InventarioDAO.OpcionRecambio nuevo = tablaRecambio.getSelectionModel().getSelectedItem();
             if (nuevo != null) {
+                lblSeleccionado.setText(String.format("Seleccionado: %s (%s) | Talla %s, %s | Stock: %d | C$ %.2f",
+                        nuevo.nombre(), nuevo.marca(), nuevo.talla(), nuevo.color(), nuevo.stock(), nuevo.precio()));
+                lblSeleccionado.setStyle("-fx-font-size: 12px; -fx-text-fill: #0f172a; -fx-font-weight: bold;");
+
                 double nuevoPrecio = nuevo.precio();
                 int cant = spnCantidad.getValue();
                 double diffSub = cant * (nuevoPrecio - detalleSeleccionado.precioUnitario());
                 double diffTot = diffSub * 1.15;
                 if (diffTot > 0) {
-                    lblDiferencia.setText(String.format(Locale.US, "Cobrar al cliente: C$ %.2f (Total)", diffTot));
-                    lblDiferencia.setStyle("-fx-font-weight: bold; -fx-text-fill: #16a34a;");
+                    lblDiferencia.setText(String.format(Locale.US, "Cobrar al cliente: C$ %.2f (Total con IVA)", diffTot));
+                    lblDiferencia.setStyle("-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #16a34a;");
                 } else if (diffTot < 0) {
-                    lblDiferencia.setText(String.format(Locale.US, "Devolver al cliente: C$ %.2f (Total)", Math.abs(diffTot)));
-                    lblDiferencia.setStyle("-fx-font-weight: bold; -fx-text-fill: #dc2626;");
+                    lblDiferencia.setText(String.format(Locale.US, "Devolver al cliente: C$ %.2f (Total con IVA)", Math.abs(diffTot)));
+                    lblDiferencia.setStyle("-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #dc2626;");
                 } else {
                     lblDiferencia.setText("Mismo valor: C$ 0.00 (sin cobro ni devolución)");
-                    lblDiferencia.setStyle("-fx-font-weight: bold; -fx-text-fill: #0284c7;");
+                    lblDiferencia.setStyle("-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #0284c7;");
                 }
             } else {
+                lblSeleccionado.setText("Ningún calzado seleccionado aún. Haga clic en una fila de la tabla.");
+                lblSeleccionado.setStyle("-fx-font-size: 12px; -fx-text-fill: #475569; -fx-font-style: italic;");
                 lblDiferencia.setText("Diferencia financiera: —");
             }
         };
 
-        cmbNuevoCalzado.valueProperty().addListener((o, v, n) -> calcularDiferencia.run());
+        tablaRecambio.getSelectionModel().selectedItemProperty().addListener((o, v, n) -> calcularDiferencia.run());
         spnCantidad.valueProperty().addListener((o, v, n) -> calcularDiferencia.run());
 
-        VBox boxRecambio = new VBox(6, lblNuevoProd, cmbNuevoCalzado, lblDiferencia);
+        VBox boxRecambio = new VBox(8, lblNuevoProd, txtBuscarRecambio, tablaRecambio, lblSeleccionado, lblDiferencia);
+        boxRecambio.setStyle("-fx-background-color: #f8fafc; -fx-padding: 10; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8;");
         boxRecambio.setVisible(false);
         boxRecambio.setManaged(false);
 
@@ -342,6 +400,7 @@ public class HistorialVentasController {
 
         TextField txtMotivo = new TextField();
         txtMotivo.setPromptText("Ej. Defecto de fábrica en costura / Talla incorrecta / Arrepentimiento");
+        txtMotivo.setStyle("-fx-padding: 6 10;");
 
         grid.add(new Label("Cantidad a Procesar *:"), 0, 0);
         grid.add(spnCantidad, 1, 0);
@@ -352,6 +411,8 @@ public class HistorialVentasController {
         grid.add(txtMotivo, 1, 3);
 
         dialog.getDialogPane().setContent(grid);
+        dialog.getDialogPane().setPrefWidth(720);
+        dialog.setResizable(true);
 
         dialog.setResultConverter(button -> {
             if (button == btnConfirmar) {
@@ -365,13 +426,13 @@ public class HistorialVentasController {
 
                 if (accion.startsWith("Recambio")) {
                     tipoEnum = VentaDAO.TipoDevolucion.RECAMBIO;
-                    InventarioDAO.OpcionRecambio nuevo = cmbNuevoCalzado.getValue();
+                    InventarioDAO.OpcionRecambio nuevo = tablaRecambio.getSelectionModel().getSelectedItem();
                     if (nuevo == null) {
-                        mostrarAlerta(Alert.AlertType.WARNING, "Selección requerida", "Debes seleccionar el nuevo calzado para el recambio.");
+                        mostrarAlerta(Alert.AlertType.WARNING, "Selección requerida", "Debes seleccionar un calzado de la tabla para el recambio.");
                         return false;
                     }
                     if (nuevo.stock() < cantDev) {
-                        mostrarAlerta(Alert.AlertType.WARNING, "Stock insuficiente", "No hay suficiente stock del nuevo calzado seleccionado (Disponible: " + nuevo.stock() + ").");
+                        mostrarAlerta(Alert.AlertType.WARNING, "Stock insuficiente", "No hay suficiente stock del calzado seleccionado (Disponible: " + nuevo.stock() + ").");
                         return false;
                     }
                     nuevoInvId = nuevo.inventarioId();
@@ -392,6 +453,10 @@ public class HistorialVentasController {
                         motivo
                 );
 
+                if (!exito) {
+                    mostrarAlerta(Alert.AlertType.ERROR, "Error", "No se pudo procesar la transacción en la base de datos.");
+                }
+
                 return exito;
             }
             return false;
@@ -399,14 +464,16 @@ public class HistorialVentasController {
 
         Optional<Boolean> res = dialog.showAndWait();
         if (res.orElse(false)) {
-            mostrarAlerta(Alert.AlertType.INFORMATION, "Éxito", "La devolución o cambio se procesó y guardó exitosamente en la base de datos.");
+            mostrarAlerta(Alert.AlertType.INFORMATION, "Éxito", "La devolución o cambio se procesó y guardó exitosamente en la factura.");
             UUID idVenta = ventaSeleccionada.getVenta_id();
             cargarDatos();
-            // Reseleccionar la venta actualizada
+            // Reseleccionar la venta actualizada y refrescar tablas
             for (Venta v : listaVentas) {
                 if (v.getVenta_id().equals(idVenta)) {
                     tablaVentas.getSelectionModel().select(v);
                     mostrarDetallesVenta(v);
+                    tablaVentas.refresh();
+                    tablaDetalles.refresh();
                     break;
                 }
             }

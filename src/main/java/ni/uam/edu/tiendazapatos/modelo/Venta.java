@@ -24,6 +24,7 @@ public class Venta {
     private double impuesto;
     private double total;
 
+    @Column(name = "estado", length = 30)
     private String estado = "PAGADA";
 
     @Column(name = "metodo_pago")
